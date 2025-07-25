@@ -32,8 +32,8 @@ const userSchema = new Schema(
       type: String,
       trim: true,
       unique: true,
-      minLength: [8, "Phone number must be at least 8 characters"],
-      maxLength: [13, "Phone number must not exceed 13 characters"],
+      // minLength: [8, "Phone number must be at least 8 characters"],
+      // maxLength: [15, "Phone number must not exceed 13 characters"],
     },
     profileUrl: {
       type: String,

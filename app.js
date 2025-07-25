@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import mainRouter from './src/api/v1/routes/index.js';
 // Create the Express app instance
 const app = express();
 
@@ -31,9 +32,8 @@ app.get('/', (req, res) => {
 
 // --- API Routes ---
 // We will import and use our main API router here later.
-// Example:
 // import router from './api/v1/routes/index.js';
-// app.use('/api/v1', router);
+app.use('/api/v1', mainRouter);
 
 
 // Export the app to be used by the server entrypoint
