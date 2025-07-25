@@ -1,7 +1,6 @@
-const dotenv = require('dotenv');
-const app = require('./app');
-// import connectDB from './config/database.js'; // We will create this file next
-
+import dotenv from 'dotenv';
+import { connectDB } from './src/config/database.js';
+import app from './app.js';
 // --- Load Environment Variables ---
 // This should be at the very top
 dotenv.config({
@@ -10,7 +9,15 @@ dotenv.config({
 
 const PORT = process.env.PORT || 8000;
 
-
+connectDB().then(
+    () => {
+        app.listen(PORT, () => {
+            console.log(`✅ Server is running on port: ${PORT}`);
+        })
+    }
+).catch((err) => {
+    console.log("MONGO DB Connection failed !!! ", err);
+})
 // --- Start the Server ---
 const startServer = () => {
     app.listen(PORT, () => {

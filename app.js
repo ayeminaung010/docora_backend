@@ -1,6 +1,5 @@
-const express = require('express');
-const cors = require('cors');
-
+import express from 'express';
+import cors from 'cors';
 // Create the Express app instance
 const app = express();
 
@@ -38,4 +37,4 @@ app.get('/', (req, res) => {
 
 
 // Export the app to be used by the server entrypoint
-module.exports = app;
+export default app;
