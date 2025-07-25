@@ -1,6 +1,7 @@
-import { User } from "../../../models/User.model.js";
+import { Request, Response } from "express";
+import { User } from "../../../models/User.model";
 
-export const getPatients = async(req, res) => {
+export const getPatients = async(req : Request, res: Response) => {
     const patientsAll = await User.find({ role: 'PATIENT' }).select('-password');
 
     res.status(200).json({
@@ -9,5 +10,3 @@ export const getPatients = async(req, res) => {
     });
 };
 
-// "start": "nodemon server.js",
-// "dev": "nodemon server.js"

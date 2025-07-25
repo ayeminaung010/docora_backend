@@ -1,9 +1,24 @@
-import { model, Schema } from "mongoose";
+import { Document, model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 
 const ObjectId = Schema.ObjectId;
 
-const userSchema = new Schema(
+export interface IUser extends Document {
+  userId: typeof ObjectId;
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+  phoneNumber?: string;
+  profileUrl?: string;
+  address?: string;
+  dateOfBirth?: Date;
+  gender?: string;
+  age?: number;
+  isCorrectPassword(password:string) : Promise<boolean>
+}
+
+const userSchema = new Schema<IUser>(
   {
     userId: ObjectId,
     name: {
@@ -64,4 +79,8 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-export const User = model("User", userSchema);
+userSchema.methods.isCorrectPassword = async function(password: string){
+  return await bcrypt.compare(password,this.password)
+}
+
+export const User = model<IUser>("User", userSchema);

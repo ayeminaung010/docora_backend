@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
-import { connectDB } from './src/config/database.js';
-import app from './app.js';
+import app from './app';
+import { connectDB } from './config/database';
 // --- Load Environment Variables ---
 // This should be at the very top
 dotenv.config({

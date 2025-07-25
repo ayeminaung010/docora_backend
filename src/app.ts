@@ -1,6 +1,6 @@
-import express from 'express';
 import cors from 'cors';
-import mainRouter from './src/api/v1/routes/index.js';
+import express from 'express';
+import mainRouter from './api/v1/routes/index';
 // Create the Express app instance
 const app = express();
 
