@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/server.ts",
     "build": "tsc -p .",
-    "start": "node dist/server.ts"
+    "start": "node dist/server.ts",
+    "db:seed": "ts-node script/migration.ts"
   },
   "keywords": [],
   "author": "",

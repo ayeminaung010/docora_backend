@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { User } from "../src/models/User.model.js";
+import { User } from "../src/models/User.model";
 import { faker } from "@faker-js/faker";
 
 const createRandomUser = () => {
@@ -22,7 +22,7 @@ const createRandomUser = () => {
 export const runUserMigration = async () => {
   try {
     const users = faker.helpers.multiple(createRandomUser, {
-      count: 20,
+      count: 1,
     });
 
     const result = await User.create(users);
