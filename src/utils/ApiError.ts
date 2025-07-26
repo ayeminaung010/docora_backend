@@ -18,7 +18,12 @@ class ApiError extends Error {
         this.success = false;
         this.errors = errors;
 
-       
+        // Capture the stack trace, excluding the constructor call
+        if (this.stack) {
+            this.stack = this.stack;
+        } else {
+            Error.captureStackTrace(this, this.constructor);
+        }
     }
 }
 
