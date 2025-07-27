@@ -1,14 +1,15 @@
-import { Document, model, Schema } from "mongoose";
+import { Document, model, Schema, Types } from "mongoose";
 import bcrypt from "bcryptjs";
 
 const ObjectId = Schema.ObjectId;
 
 export interface IUser extends Document {
-  userId: typeof ObjectId;
+  _id: Types.ObjectId;
   name: string;
   email: string;
   password: string;
   role: string;
+  verifyEmail: boolean;
   phoneNumber?: string;
   profileUrl?: string;
   address?: string;
@@ -20,7 +21,6 @@ export interface IUser extends Document {
 
 const userSchema = new Schema<IUser>(
   {
-    userId: ObjectId,
     name: {
       type: String,
       required: true,
@@ -43,10 +43,15 @@ const userSchema = new Schema<IUser>(
       enum: ["PATIENT", "DOCTOR"],
       default: "PATIENT",
     },
+    verifyEmail:{
+      type: Boolean,
+      default: false,
+    },
     phoneNumber: {
       type: String,
       trim: true,
       unique: true,
+      sparse: true,
       // minLength: [8, "Phone number must be at least 8 characters"],
       // maxLength: [15, "Phone number must not exceed 13 characters"],
     },
