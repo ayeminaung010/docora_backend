@@ -2,21 +2,21 @@ import { Error } from "mongoose";
 
 class ApiError extends Error {
     statusCode: number;
-    data: null;
-    success: boolean;
-    errors: any[];
+    // data?: null;
+    // errors: any[];
+    message: string;
 
     constructor(
-        message: string,
         statusCode: number = 500,
-        data: null = null,
-        errors: any[] = []
+        // data: null = null,
+        // errors: any[] = [],
+        message: string = "Error"
     ) {
         super(message);
         this.statusCode = statusCode;
-        this.data = data;
-        this.success = false;
-        this.errors = errors;
+        // this.data = data;
+        // this.errors = errors;
+        this.message = message;
 
         // Capture the stack trace, excluding the constructor call
         if (this.stack) {
