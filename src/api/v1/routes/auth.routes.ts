@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import { signUp, login, verifyToken, checkTokenStatus } from "../controllers/auth.controller";
 import {
   authenticate,

@@ -56,7 +56,6 @@ export class AuthService {
   }
 
   static async login(req: loginRequest) {
-    console.log(req);
 
     const user = await User.findOne({ email: req.email });
     console.log(user);
