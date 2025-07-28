@@ -14,6 +14,8 @@ export interface IDoctor extends Document {
     workPlace?: string;
     graduateSchool?: string;
     consultationType: object;
+    isVerified?: boolean;
+    submitAt?: Date;
 }
 
 const doctorSchema = new Schema<IDoctor>({
@@ -67,6 +69,14 @@ const doctorSchema = new Schema<IDoctor>({
     consultationType: {
         type: Object,
         default: { "Chat": true, "Video": true, "In-person": true }
+    },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
+    submitAt: {
+        type: Date,
+        default: Date.now
     }
 });
 

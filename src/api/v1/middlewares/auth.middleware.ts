@@ -40,7 +40,6 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
     req.user = {
       userId: decoded.userId
     };
-
     next();
   } catch (error) {
     return res.status(401).json({
