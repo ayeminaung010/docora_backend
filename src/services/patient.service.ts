@@ -4,14 +4,14 @@ import { ApiError } from "../utils/ApiError";
 import { User } from "../models/User.model";
 
 export interface detailFormRequest {
-  userId: Types.ObjectId;
+//   userId: Types.ObjectId;
   bloodType: string;
   allergies?: string[];
   chronicConditions?: string[];
   currentMedications?: string[];
 }
 export interface updatePatientRequest {
-  userId: Types.ObjectId;
+//   userId: Types.ObjectId;
   bloodType?: string;
   allergies?: string[];
   chronicConditions?: string[];
@@ -19,18 +19,18 @@ export interface updatePatientRequest {
 }
 
 export class PatientService {
-  static async patientDetailForm(req: detailFormRequest) {
-    const existUser = await User.findOne({ _id: req.userId });
-    const existPatient = await Patient.findOne({ userId: req.userId });
+  static async patientDetailForm(userId: string, req: detailFormRequest) {
+    // const existUser = await User.findOne({ userId });
+    const existPatient = await Patient.findOne({ userId });
 
-    if (!existUser) {
-      throw new ApiError(404, "User doesn't exist");
-    }
+    // if (!existUser) {
+    //   throw new ApiError(404, "User doesn't exist");
+    // }
     if (existPatient) {
       throw new ApiError(403, "Patient data already submitted");
     }
     const newPatient = new Patient({
-      userId: req.userId,
+      userId: userId, 
       bloodType: req.bloodType,
       allergies: req.allergies,
       chronicConditions: req.chronicConditions,
@@ -42,13 +42,13 @@ export class PatientService {
     return savedPatient;
   }
 
-  static async patientInfoUpdate(req: updatePatientRequest) {
-    const existUser = await User.findOne({ _id: req.userId });
-    if (!existUser) {
-      throw new ApiError(404, "User doesn't exist");
-    }
+  static async patientInfoUpdate(userId: string, req: updatePatientRequest) {
+    // const existUser = await User.findOne({ userId});
+    // if (!existUser) {
+    //   throw new ApiError(404, "User doesn't exist");
+    // }
 
-    const existPatient = await Patient.findOne({ userId: req.userId });
+    const existPatient = await Patient.findOne({ userId });
     if (!existPatient) {
       throw new ApiError(
         404,
@@ -72,7 +72,7 @@ export class PatientService {
     }
 
     const updatedPatient = await Patient.findOneAndUpdate(
-      { userId: req.userId },
+      { userId: userId },
       {
         $set: {
           ...updateData,
@@ -92,19 +92,17 @@ export class PatientService {
     return updatedPatient;
   }
 
+  //    static async getPatientInfo(userId: Types.ObjectId) {
+  //     const existUser = await User.findOne({ _id: userId });
+  //     if (!existUser) {
+  //       throw new ApiError(404, "User doesn't exist");
+  //     }
 
-  
-//    static async getPatientInfo(userId: Types.ObjectId) {
-//     const existUser = await User.findOne({ _id: userId });
-//     if (!existUser) {
-//       throw new ApiError(404, "User doesn't exist");
-//     }
+  //     const patientInfo = await Patient.findOne({ userId }).populate('userId', 'name email');
+  //     if (!patientInfo) {
+  //       throw new ApiError(404, "Patient data not found");
+  //     }
 
-//     const patientInfo = await Patient.findOne({ userId }).populate('userId', 'name email');
-//     if (!patientInfo) {
-//       throw new ApiError(404, "Patient data not found");
-//     }
-
-//     return patientInfo;
-//   }
+  //     return patientInfo;
+  //   }
 }

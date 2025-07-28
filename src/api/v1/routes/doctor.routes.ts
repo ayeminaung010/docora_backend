@@ -4,6 +4,9 @@ import { authenticate } from "../middlewares/auth.middleware";
 
 
 const router = Router();
-router.post("/verifyIdentity",authenticate ,verifyIdentityDoctor );
+
+router.use(authenticate);
+
+router.post("/verifyIdentity" ,verifyIdentityDoctor );
 
 export default router;
