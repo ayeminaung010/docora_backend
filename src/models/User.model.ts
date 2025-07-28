@@ -1,7 +1,6 @@
 import { Document, model, Schema, Types } from "mongoose";
 import bcrypt from "bcryptjs";
 
-const ObjectId = Schema.ObjectId;
 
 export interface IUser extends Document {
   _id: Types.ObjectId;
