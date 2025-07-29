@@ -82,3 +82,23 @@ export const checkTokenStatus = asyncHandler(async (req: AuthenticatedRequest, r
     }
 });
 
+export const changePassword = asyncHandler(
+    async( req: AuthenticatedRequest, res: Response) => {
+        const userId =  req.user?.userId;
+        if(!userId) {
+            return res.status(401).json(
+                new ApiResponse(401, null, "Unauthorized - User ID not found")
+            );
+        }
+
+        const result = await AuthService.changePassword(userId, req.body);
+        return res.status(200).json(
+            new ApiResponse(200, result, "Password changed successfully")
+        );
+    }
+);
+
+export const logout = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    return res.status(200).json(new ApiResponse(200, null, "User logged out successfully"));
+});
+

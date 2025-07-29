@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { signUp, login, verifyToken, checkTokenStatus } from "../controllers/auth.controller";
+import { signUp, login, verifyToken, checkTokenStatus, changePassword, logout } from "../controllers/auth.controller";
 import {
   authenticate,
   authenticateTokenWithAutoRefresh,
@@ -9,7 +9,10 @@ const router = Router();
 router.post("/signup", signUp);
 router.post("/login", login);
 
-router.post("/verifyToken", authenticate, verifyToken);
 router.post("/refreshToken", authenticateTokenWithAutoRefresh, checkTokenStatus);
+router.use(authenticate);
+router.post("/verifyToken", verifyToken);
+router.patch("/changePassword", changePassword);
+router.post("/logout", logout)
 
 export default router;
