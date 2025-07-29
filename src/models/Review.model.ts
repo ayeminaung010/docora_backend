@@ -47,7 +47,6 @@ const reviewSchema = new Schema<IReview>({
         type: Date,
         default: Date.now
     }
-
 });
 
 export const Review = model<IReview>("Review",reviewSchema);

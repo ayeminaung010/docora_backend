@@ -157,7 +157,7 @@ export class DoctorService {
   return popularDoctors;
 
   }
-}
+
   static async getPatientDetails(userId: string, patientId: string): Promise<any> {
     const [userDetails, patientDetails] = await Promise.all([
       User.findById(userId).select("-password").lean(), 
