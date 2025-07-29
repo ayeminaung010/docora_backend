@@ -24,3 +24,21 @@ export const verifyIdentityDoctor = asyncHandler(
       );
   }
 );
+
+export const profileUpdate = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "User ID is required"));
+    }
+
+    const updatedProfile = await DoctorService.updateProfile(userId, req.body);
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, updatedProfile, "Profile updated successfully"));
+  }
+);

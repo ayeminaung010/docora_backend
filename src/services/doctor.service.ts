@@ -1,5 +1,5 @@
-import { Doctor } from "../models/Doctor.model";
-import { User } from "../models/User.model";
+import { Doctor, IDoctor } from "../models/Doctor.model";
+import { IUser, User } from "../models/User.model";
 import { ApiError } from "../utils/ApiError";
 
 export interface VerifyIdentitiyRequest {
@@ -11,25 +11,41 @@ export interface VerifyIdentitiyRequest {
   govermentId: string;
 }
 
+export interface UpdateProfileRequest {
+  name?: string;
+  profile_url?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  date_of_birth?: Date;
+  gender?: string;
+  age?: number;
+  yearOfExperience?: string;
+  speciality?: string;
+  workPlace?: string;
+  graduateSchool?: string;
+}
 export class DoctorService {
-  static async verifyIdentity(userId: string, req: VerifyIdentitiyRequest): Promise<any> {
+  static async verifyIdentity(
+    userId: string,
+    req: VerifyIdentitiyRequest
+  ): Promise<any> {
     // Check if the doctor already exists
     const existingDoctor = await Doctor.findOne({ userId });
     if (existingDoctor) {
       throw new ApiError(403, "You already submitted your identities");
     }
-    
+
     const user = await User.findById(userId);
-    
+
     if (!user) {
-        throw new ApiError(404, "User not found");
+      throw new ApiError(404, "User not found");
     }
 
-    if(user.role !== "DOCTOR") {
-        user.role = "DOCTOR"; 
-        await user.save();
+    if (user.role !== "DOCTOR") {
+      user.role = "DOCTOR";
+      await user.save();
     } //update role in user model
-    
 
     // Create a new doctor entry
     const doctorDetails = {
@@ -43,9 +59,73 @@ export class DoctorService {
       isVerified: true, // Assuming verification is successful becoz we don't have admin panel to approve yet
       submitAt: new Date(),
     };
-    
+
     await new Doctor(doctorDetails).save();
 
-    return true; 
+    return true;
+  }
+
+  static async updateProfile(
+    userId: string,
+    profileData: UpdateProfileRequest
+  ): Promise<any> {
+    const [user, doctor] = await Promise.all([
+      User.findById(userId),
+      Doctor.findOne({ userId }),
+    ]);
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    if (!doctor) {
+      throw new ApiError(404, "Doctor not found");
+    }
+    // Find the doctor by userId
+    if (
+      profileData?.name ||
+      profileData?.profile_url ||
+      profileData?.email ||
+      profileData?.phone ||
+      profileData?.address ||
+      profileData?.date_of_birth
+    ) {
+      // Update user profile
+      if (profileData.name) user.name = profileData.name;
+      if (profileData.email) {
+        // Check if email is already in use by another user
+        const existingUser = await User.findOne({ email: profileData.email });
+        if (existingUser && existingUser._id.toString() !== userId) {
+          throw new ApiError(400, "Email is already in use ");
+        }
+        user.email = profileData.email;
+        user.verifyEmail = false; // Reset email verification status
+      }
+      if (profileData.phone) user.phoneNumber = profileData.phone;
+      if (profileData.address) user.address = profileData.address;
+      if (profileData.date_of_birth)
+        user.dateOfBirth = profileData.date_of_birth;
+      if (profileData.gender) user.gender = profileData.gender;
+      if (profileData.age) user.age = profileData.age;
+      if (profileData.profile_url) user.profileUrl = profileData.profile_url;
+      await user.save();
+      return user;
+    }
+
+    if (
+      profileData.speciality ||
+      profileData.yearOfExperience ||
+      profileData.workPlace ||
+      profileData.graduateSchool
+    ) {
+      // Update doctor profile
+      if (profileData.speciality) doctor.speciality = profileData.speciality;
+      if (profileData.yearOfExperience)
+        doctor.yearsOfExperience = profileData.yearOfExperience;
+      if (profileData.workPlace) doctor.workPlace = profileData.workPlace;
+      if (profileData.graduateSchool)
+        doctor.graduateSchool = profileData.graduateSchool;
+      await doctor.save();
+      return doctor;
+    }
   }
 }
