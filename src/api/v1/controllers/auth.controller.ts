@@ -27,78 +27,144 @@ export const verifyToken = asyncHandler(
   }
 );
 
-export const refreshToken = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+export const refreshToken = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.userId;
-    
+
     if (!userId) {
-        return res.status(401).json(
-            new ApiResponse(401, null, "Unauthorized - User ID not found")
-        );
+      return res
+        .status(401)
+        .json(new ApiResponse(401, null, "Unauthorized - User ID not found"));
     }
 
     try {
-        const result = await AuthService.refreshToken(userId);
+      const result = await AuthService.refreshToken(userId);
 
-        return res.status(200).json(
-            new ApiResponse(200, {
-                token: result.token,
-                user: result.user,
-                refreshed: true
-            }, "Token refreshed successfully")
-        );
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          {
+            token: result.token,
+            user: result.user,
+            refreshed: true,
+          },
+          "Token refreshed successfully"
+        )
+      );
     } catch (error: any) {
-        return res.status(401).json(
-            new ApiResponse(401, null, error.message)
-        );
+      return res.status(401).json(new ApiResponse(401, null, error.message));
     }
-});
-
-// New endpoint for checking token status
-export const checkTokenStatus = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const authHeader = req.headers.authorization;
-    const token = authHeader?.substring(7);
-    
-    if (!token) {
-        return res.status(401).json(
-            new ApiResponse(401, null, "No token provided")
-        );
-    }
-
-    try {
-        const isExpiringSoon = AuthService.isTokenExpiringSoon(token);
-        const decoded = AuthService.verifyToken(token);
-        
-        return res.status(200).json(
-            new ApiResponse(200, {
-                valid: true,
-                expiringSoon: isExpiringSoon,
-                expiresAt: decoded.exp ? new Date(decoded.exp * 1000) : null
-            }, "Token status checked")
-        );
-    } catch (error: any) {
-        return res.status(401).json(
-            new ApiResponse(401, { valid: false }, error.message)
-        );
-    }
-});
-
-export const changePassword = asyncHandler(
-    async( req: AuthenticatedRequest, res: Response) => {
-        const userId =  req.user?.userId;
-        if(!userId) {
-            return res.status(401).json(
-                new ApiResponse(401, null, "Unauthorized - User ID not found")
-            );
-        }
-
-        const result = await AuthService.changePassword(userId, req.body);
-        return res.status(200).json(
-            new ApiResponse(200, result, "Password changed successfully")
-        );
-    }
+  }
 );
 
-export const logout = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    return res.status(200).json(new ApiResponse(200, null, "User logged out successfully"));
+// New endpoint for checking token status
+export const checkTokenStatus = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.substring(7);
+
+    if (!token) {
+      return res
+        .status(401)
+        .json(new ApiResponse(401, null, "No token provided"));
+    }
+
+    try {
+      const isExpiringSoon = AuthService.isTokenExpiringSoon(token);
+      const decoded = AuthService.verifyToken(token);
+
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          {
+            valid: true,
+            expiringSoon: isExpiringSoon,
+            expiresAt: decoded.exp ? new Date(decoded.exp * 1000) : null,
+          },
+          "Token status checked"
+        )
+      );
+    } catch (error: any) {
+      return res
+        .status(401)
+        .json(new ApiResponse(401, { valid: false }, error.message));
+    }
+  }
+);
+
+export const changePassword = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res
+        .status(401)
+        .json(new ApiResponse(401, null, "Unauthorized - User ID not found"));
+    }
+
+    const result = await AuthService.changePassword(userId, req.body);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, result, "Password changed successfully"));
+  }
+);
+
+export const logout = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "User logged out successfully"));
+  }
+);
+
+export const forgotPassword = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { email } = req.body;
+
+    if (!email) {
+      throw new ApiError(400, "Email is required");
+    }
+
+    await AuthService.forgotPassword(email);
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, null, "Password reset link sent to your email")
+      );
+  }
+);
+
+export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
+  const { otp } = req.body;
+  if (!otp) {
+    throw new ApiError(400, "OTP is required");
+  }
+  // Simulate OTP verification
+  console.log(`OTP ${otp} verified successfully`);
+  return res
+    .status(200)
+    .json(new ApiResponse(200, null, "OTP verified successfully"));
 });
 
+export const resetPassword = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { newPassword, email } = req.body;
+    if (!newPassword) {
+      throw new ApiError(400, "New password is required");
+    }
+    if (!email) {
+      throw new ApiError(500, "Email is required");
+    }
+    const userId = await AuthService.getUserById(email);
+    if (!userId) {
+      throw new ApiError(404, "User not found");
+    }
+    const result = await AuthService.changePassword(userId, {
+      password: newPassword,
+    });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, result, "Password reset successfully"));
+  }
+);
