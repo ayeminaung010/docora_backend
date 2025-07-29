@@ -1,5 +1,4 @@
-import { User } from './../../../models/User.model';
-import { Request, Response } from "express";
+import { Response } from "express";
 import { asyncHandler } from "../../../utils/asyncHandler";
 import { ApiResponse } from "../../../utils/ApiResponse";
 import { DoctorService } from "../../../services/doctor.service";
@@ -55,3 +54,26 @@ export const getPopularDoctors = asyncHandler(async (req: AuthenticatedRequest, 
   return res.status(200).json(new ApiResponse(200, popularDoctors, "Data loaded successfully"));
 
 });
+
+export const viewUserDetails = asyncHandler(
+  async(req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?.userId;
+    const { id } = req.params;
+    if (!userId) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "User ID is required"));
+    }
+    const userDetails = await DoctorService.getPatientDetails(userId, id);
+
+    if (!userDetails) {
+      return res
+        .status(404)
+        .json(new ApiResponse(404, {}, "User not found"));
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, userDetails, "User details retrieved successfully"));
+  }
+);
