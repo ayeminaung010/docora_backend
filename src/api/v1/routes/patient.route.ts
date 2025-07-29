@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   patientDetailForm,
-  patientInfoUpdate,
+  patientProfileUpdate,
 } from "../controllers/patient.controller";
 import { authenticate } from "../middlewares/auth.middleware";
 import { authorize } from "../middlewares/authorize.middleware";
@@ -11,6 +11,6 @@ const router = Router();
 router.use(authenticate);
 
 router.post("/patientDetailForm", patientDetailForm);
-router.patch("/patientInfoUpdate", patientInfoUpdate);
+router.patch("/patientInfoUpdate", patientProfileUpdate);
 
 export default router;

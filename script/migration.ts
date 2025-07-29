@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 import { connectDB } from '../src/config/database';
 import { runUserMigration } from './userMigration';
+import { runDoctorMigration } from './doctorMigration';
+
 
 // --- .env configuration ---
 dotenv.config();
@@ -13,4 +15,5 @@ connectDB()
     console.log("MONGO DB Connection failed !!! ", err);
   });
 
-runUserMigration();
+// runUserMigration();
+runDoctorMigration();

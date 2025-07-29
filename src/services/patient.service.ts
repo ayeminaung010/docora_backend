@@ -4,14 +4,20 @@ import { ApiError } from "../utils/ApiError";
 import { User } from "../models/User.model";
 
 export interface detailFormRequest {
-//   userId: Types.ObjectId;
   bloodType: string;
   allergies?: string[];
   chronicConditions?: string[];
   currentMedications?: string[];
 }
 export interface updatePatientRequest {
-//   userId: Types.ObjectId;
+  name?: string;
+  profile_url?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  date_of_birth?: Date;
+  gender?: string;
+  age?: number;
   bloodType?: string;
   allergies?: string[];
   chronicConditions?: string[];
@@ -19,18 +25,18 @@ export interface updatePatientRequest {
 }
 
 export class PatientService {
-  static async patientDetailForm(userId: string, req: detailFormRequest) {
-    // const existUser = await User.findOne({ userId });
+  static async patientDetailForm(
+    userId: string,
+    req: detailFormRequest
+  ): Promise<any> {
     const existPatient = await Patient.findOne({ userId });
 
-    // if (!existUser) {
-    //   throw new ApiError(404, "User doesn't exist");
-    // }
     if (existPatient) {
       throw new ApiError(403, "Patient data already submitted");
     }
+
     const newPatient = new Patient({
-      userId: userId, 
+      userId: userId,
       bloodType: req.bloodType,
       allergies: req.allergies,
       chronicConditions: req.chronicConditions,
@@ -42,67 +48,71 @@ export class PatientService {
     return savedPatient;
   }
 
-  static async patientInfoUpdate(userId: string, req: updatePatientRequest) {
-    // const existUser = await User.findOne({ userId});
-    // if (!existUser) {
-    //   throw new ApiError(404, "User doesn't exist");
-    // }
+  static async patientProfileUpdate(
+    userId: string,
+    profileData: updatePatientRequest
+  ): Promise<any> {
+    const [user, patient] = await Promise.all([
+      User.findById(userId),
+      Patient.findOne({ userId }),
+    ]);
 
-    const existPatient = await Patient.findOne({ userId });
-    if (!existPatient) {
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    if (!patient) {
       throw new ApiError(
         404,
         "Patient data not found. Please submit initial patient details first."
       );
     }
 
-    const updateData: Partial<updatePatientRequest> = {};
-
-    if (req.bloodType !== undefined) {
-      updateData.bloodType = req.bloodType;
-    }
-    if (req.allergies !== undefined) {
-      updateData.allergies = req.allergies;
-    }
-    if (req.chronicConditions !== undefined) {
-      updateData.chronicConditions = req.chronicConditions;
-    }
-    if (req.currentMedications !== undefined) {
-      updateData.currentMedications = req.currentMedications;
-    }
-
-    const updatedPatient = await Patient.findOneAndUpdate(
-      { userId: userId },
-      {
-        $set: {
-          ...updateData,
-          updatedAt: new Date(),
-        },
-      },
-      {
-        new: true,
-        runValidators: true,
+    if (
+      profileData?.name ||
+      profileData?.profile_url ||
+      profileData?.email ||
+      profileData?.phone ||
+      profileData?.address ||
+      profileData?.date_of_birth
+    ) {
+      if (profileData.name) user.name = profileData.name;
+      if (profileData.email) {
+        // Check if email is already in use by another user
+        const existingUser = await User.findOne({ email: profileData.email });
+        if (existingUser && existingUser._id.toString() !== userId) {
+          throw new ApiError(400, "Email is already in use ");
+        }
+        user.email = profileData.email;
+        user.verifyEmail = false; 
       }
-    );
+      if (profileData.phone) user.phoneNumber = profileData.phone;
+      if (profileData.address) user.address = profileData.address;
+      if (profileData.date_of_birth)
+        user.dateOfBirth = profileData.date_of_birth;
+      if (profileData.gender) user.gender = profileData.gender;
+      if (profileData.age) user.age = profileData.age;
+      if (profileData.profile_url) user.profileUrl = profileData.profile_url;
 
-    if (!updatedPatient) {
-      throw new ApiError(500, "Failed to update patient information");
+      await user.save();
+      return user;
     }
 
-    return updatedPatient;
+    if (
+      profileData.bloodType ||
+      profileData.allergies ||
+      profileData.chronicConditions ||
+      profileData.currentMedications
+    ) {
+      if (profileData.bloodType) patient.bloodType = profileData.bloodType;
+      if (profileData.allergies) patient.allergies = profileData.allergies;
+      if (profileData.chronicConditions)
+        patient.chronicConditions = profileData.chronicConditions;
+      if (profileData.currentMedications)
+        patient.currentMedications = profileData.currentMedications;
+
+      await patient.save();
+      return patient;
+    }
   }
-
-  //    static async getPatientInfo(userId: Types.ObjectId) {
-  //     const existUser = await User.findOne({ _id: userId });
-  //     if (!existUser) {
-  //       throw new ApiError(404, "User doesn't exist");
-  //     }
-
-  //     const patientInfo = await Patient.findOne({ userId }).populate('userId', 'name email');
-  //     if (!patientInfo) {
-  //       throw new ApiError(404, "Patient data not found");
-  //     }
-
-  //     return patientInfo;
-  //   }
 }

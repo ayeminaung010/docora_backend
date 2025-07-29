@@ -22,7 +22,7 @@ const createRandomUser = () => {
 export const runUserMigration = async () => {
   try {
     const users = faker.helpers.multiple(createRandomUser, {
-      count: 1,
+      count: 10,
     });
 
     const result = await User.create(users);

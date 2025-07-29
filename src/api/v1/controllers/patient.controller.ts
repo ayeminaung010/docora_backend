@@ -21,7 +21,7 @@ export const patientDetailForm = asyncHandler(
   }
 );
 
-export const patientInfoUpdate = asyncHandler(
+export const patientProfileUpdate = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.userId;
     if (!userId) {
@@ -30,11 +30,11 @@ export const patientInfoUpdate = asyncHandler(
         .json(new ApiResponse(400, {}, "User ID is required"));
     }
 
-    const result = await PatientService.patientInfoUpdate(userId, req.body);
+    const result = await PatientService.patientProfileUpdate(userId, req.body);
     return res
       .status(200)
       .json(
-        new ApiResponse(200, result, "Patient Information Updated Successfully")
+        new ApiResponse(200, result, "Information Updated Successfully")
       );
   }
 );
