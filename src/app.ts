@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express from 'express';
 import mainRouter from './api/v1/routes/index';
+
 // Create the Express app instance
 const app = express();
 
