@@ -2,7 +2,7 @@ import { Document, model, Schema, Types } from "mongoose";
 
 export interface IDoctor extends Document {
     _id: Types.ObjectId;
-    userId: Types.ObjectId;
+    userId: Types.ObjectId; 
     speciality: string;
     bio?: string;
     yearsOfExperience: string;
@@ -10,7 +10,7 @@ export interface IDoctor extends Document {
     issueCountry: string;
     medicalCertificate: string;
     govermentId: string;
-    averageRating?: string;
+    averageRating?: number;
     workPlace?: string;
     graduateSchool?: string;
     consultationType: object;
@@ -55,8 +55,10 @@ const doctorSchema = new Schema<IDoctor>({
         required: true,
     },
     averageRating: {
-        type: String,
-        default: "0",
+        type: Number,
+        default: 2.5,
+        min: 0,
+        max: 5,
     },
     workPlace: {
         type: String,

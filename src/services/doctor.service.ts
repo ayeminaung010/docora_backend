@@ -25,6 +25,8 @@ export interface UpdateProfileRequest {
   workPlace?: string;
   graduateSchool?: string;
 }
+
+
 export class DoctorService {
   static async verifyIdentity(
     userId: string,
@@ -127,5 +129,17 @@ export class DoctorService {
       await doctor.save();
       return doctor;
     }
+  }
+
+  static async popularDoctors(limit: number = 5):Promise<any>{
+  const popularDoctors = await Doctor.find({ isVerified: true })
+    .populate('userId', 'name profileUrl') 
+    .sort({ averageRating: -1, yearsOfExperience: -1 }) 
+    .limit(limit)
+    .select('speciality averageRating')
+    .lean(); 
+
+  return popularDoctors;
+
   }
 }
