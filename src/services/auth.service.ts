@@ -18,6 +18,10 @@ export interface JWTPayload {
   exp?: number;
 }
 
+export interface PasswordChangeRequest{
+  password: string;
+}
+
 export class AuthService {
   private static readonly JWT_SECRET = (process.env.JWT_SECRET ||
     "irene_secret") as string;
@@ -56,7 +60,6 @@ export class AuthService {
   }
 
   static async login(req: loginRequest) {
-
     const user = await User.findOne({ email: req.email });
     console.log(user);
     if (!user) {
@@ -98,7 +101,7 @@ export class AuthService {
   ): Promise<{ token: string; user: IUser }> {
     const user = await User.findById(userId).select("-password");
     if (!user) {
-      throw new ApiError(404,"User not found");
+      throw new ApiError(404, "User not found");
     }
 
     const newToken = this.generateToken(userId);
@@ -119,13 +122,26 @@ export class AuthService {
 
       return { token: currentToken, refreshed: false };
     } catch (error) {
-      throw new ApiError(401,"Token refresh required");
+      throw new ApiError(401, "Token refresh required");
     }
   }
 
-  static async getUserById(userId: string): Promise<any>{
-    const user = await User.findById({_id: userId});
+  static async getUserById(userId: string): Promise<any> {
+    const user = await User.findById({ _id: userId });
     return user;
+  }
 
+  static async changePassword(
+    userId: string,
+    req: PasswordChangeRequest
+  ): Promise<IUser> {
+    const user : IUser | null  = await User.findById(userId);
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    user.password = req.password;
+    await user.save();
+    return user;
   }
 }
