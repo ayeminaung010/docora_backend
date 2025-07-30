@@ -1,25 +1,40 @@
 import { model, Schema, Types } from "mongoose";
 
+const timeSlotSchema = new Schema(
+  {
+    time: { type: String, required: true },
+    isBooked: { type: Boolean, default: false, required: true },
+    disabled: { type: Boolean, default: false, required: true },
+  },
+  { _id: false }
+);
+
+export interface ITimeSlot extends Types.Subdocument {
+  time: string;
+  isBooked: boolean;
+  disabled: boolean;
+}
+
 export interface ISchedule extends Document {
-    _id: Types.ObjectId;
-    doctorId: Types.ObjectId;
-    date: Date;
-    fullTimeSlots: string[]; // e.g., ["09:00", "10:00", "11:00"]
+  _id: Types.ObjectId;
+  doctorId: Schema.Types.ObjectId;
+  date: Date;
+  fullTimeSlots: ITimeSlot[];
 }
 const scheduleSchema = new Schema<ISchedule>({
-    doctorId: {
-        type: Schema.Types.ObjectId,
-        required: true,
-        ref: "User",
-    },
-    date: {
-        type: Date,
-        required: true,
-    },
-    fullTimeSlots: {
-        type: [String],
-        required: true,
-    },
-})
+  doctorId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
+  },
+  date: {
+    type: Date,
+    required: true,
+  },
+  fullTimeSlots: {
+    type: [timeSlotSchema],
+    required: true,
+  },
+});
 
 export const Schedule = model<ISchedule>("Schedule", scheduleSchema);

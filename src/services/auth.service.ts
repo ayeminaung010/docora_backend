@@ -18,7 +18,7 @@ export interface JWTPayload {
   exp?: number;
 }
 
-export interface PasswordChangeRequest{
+export interface PasswordChangeRequest {
   password: string;
 }
 
@@ -135,7 +135,7 @@ export class AuthService {
     userId: string,
     req: PasswordChangeRequest
   ): Promise<IUser> {
-    const user : IUser | null  = await User.findById(userId);
+    const user: IUser | null = await User.findById(userId);
     if (!user) {
       throw new ApiError(404, "User not found");
     }
@@ -143,5 +143,16 @@ export class AuthService {
     user.password = req.password;
     await user.save();
     return user;
+  }
+
+  static async forgotPassword(email: string): Promise<void> {
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    ////OTP send
+    // For now, we will just simulate the process
+    console.log(`Password reset link sent to ${email}`);
   }
 }
