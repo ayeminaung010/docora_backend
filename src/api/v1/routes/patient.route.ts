@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { createConsultation } from "../controllers/consultations.controller";
 import {
   filterBySpecialty,
   getPopularDoctors,
@@ -8,7 +9,6 @@ import {
   searchDoctorsByNameAndSpecialty,
 } from "../controllers/patient.controller";
 import { authenticate } from "../middlewares/auth.middleware";
-import { authorize } from "../middlewares/authorize.middleware";
 
 const router = Router();
 // router.use(authorize(["PATIENT"]));
@@ -26,9 +26,9 @@ router.get("/search/:specialty", filterBySpecialty);
 // for home page
 
 // for appointment page
-// router.get("/consultaions/upcoming", getUpcomingConsulations)
-// router.get("/consultaions/past", getPastConsulations)
-// router.get("/consultaions/filter", getFilteredConsulations)
+// router.get("/consultations/upcoming", getUpcomingConsultations)
+// router.get("/consultations/past", getPastConsultations)
+// router.get("/consultations/filter", getFilteredConsultations)
 
 //for chat page
 // router.get("/chats", getChats)
@@ -36,11 +36,18 @@ router.get("/search/:specialty", filterBySpecialty);
 
 //for profile page
 
-
 // router.get('doctor/:id', viewDoctorProfile);
 
 // for booking appointment
-// router.get("/consultaions/booking", createConsulation)
-
+router.post("/consultations/booking/:doctorId", createConsultation);
 
 export default router;
+
+
+// patient booking appointment -> create consultation //doing
+// patient create healthconcerns -> create healthconcerns //done
+// patient view consultation -> view consultation
+// patient end consultation -> end consultation
+// patient cancel consultation -> cancel consultation
+// patient view consultation notes -> view consultation notes
+// patient review doctor -> review doctor // done
