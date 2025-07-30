@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import { connectDB } from '../src/config/database';
 import { runUserMigration } from './userMigration';
 import { runDoctorMigration } from './doctorMigration';
+import {  runScheduleSeed } from './scheduleMigration';
 
 
 // --- .env configuration ---
@@ -16,4 +17,5 @@ connectDB()
   });
 
 // runUserMigration();
-runDoctorMigration();
+// runDoctorMigration();
+runScheduleSeed();
