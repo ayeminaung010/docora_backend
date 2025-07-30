@@ -1,17 +1,30 @@
 import { Document, model, Schema, Types } from "mongoose";
 
+export interface INote extends Types.Subdocument {
+  medications?: string[];
+  notes?: string;
+  advice?: string;
+  createdAt: Date;
+}
+
+export interface IHealthConcerns extends Types.Subdocument {
+  symptoms: string;
+  duration: string;
+  medications: string[];
+  attachments: string[];
+}
+
 export interface IConsultation extends Document {
   _id: Types.ObjectId;
   patientId: Types.ObjectId;
   doctorId: Types.ObjectId;
-  // scheduleId: Types.ObjectId;
+  scheduleId: Types.ObjectId;
   startTime: Date;
   endTime?: Date;
   consultationType: string;
   status: string;
-  notes?: string;
-  prescription?: Object;
-  advice?: string;
+  consultNotes: INote[];
+  healthConcerns: IHealthConcerns[];
 }
 
 const consultationSchema = new Schema<IConsultation>(
@@ -19,6 +32,11 @@ const consultationSchema = new Schema<IConsultation>(
     patientId: {
       type: Schema.Types.ObjectId,
       ref: "Patient",
+      required: true,
+    },
+    scheduleId: {
+      type: Schema.Types.ObjectId,
+      ref: "Schedule",
       required: true,
     },
     doctorId: {
@@ -40,7 +58,7 @@ const consultationSchema = new Schema<IConsultation>(
 
     endTime: {
       type: Date,
-      // required: true,
+      required: false,
       validate: {
         validator: function (this: IConsultation, value: Date) {
           // Ensure endTime is after startTime
@@ -60,17 +78,25 @@ const consultationSchema = new Schema<IConsultation>(
       enum: ["PENDING", "COMPLETED", "CANCELLED"],
       trim: true,
     },
-    notes: {
-      type: String,
-      trim: true,
-    },
-    prescription: {
-      type: Object,
-    },
-    advice: {
-      type: String,
-      trim: true,
-    },
+    consultNotes: [
+      {
+        medications: [String],
+        notes: String,
+        advice: String,
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+    healthConcerns: [
+      {
+        symptoms: String,
+        duration: String,
+        medications: [String],
+        attachments: [String],
+      },
+    ],
   },
   {
     timestamps: true,

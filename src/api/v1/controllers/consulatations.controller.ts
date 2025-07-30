@@ -21,7 +21,7 @@ export const createConsultation = asyncHandler(
         .json(new ApiResponse(400, {}, "Doctor ID is required"));
     }
 
-    const result = await ConsultationService.createConsulatation(
+    const result = await ConsultationService.createConsultation(
       userId,
       doctorId,
       req.body
@@ -32,10 +32,23 @@ export const createConsultation = asyncHandler(
   }
 );
 
-export const updateConsultation = asyncHandler(
+export const endConsultation = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    const result = await ConsultationService.updateConsultation(id, req.body);
+    const result = await ConsultationService.endConsultation(id);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, result, "Consultation ended successfully"));
+  }
+);
+
+export const addNoteToConsultation = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    const result = await ConsultationService.addNoteToConsultation(
+      id,
+      req.body
+    );
     return res
       .status(200)
       .json(new ApiResponse(200, result, "Consultation updated successfully"));

@@ -1,47 +1,78 @@
-import { Consultation, IConsultation } from "../models/Consultation.model"
+import { Consultation, IConsultation } from "../models/Consultation.model";
+import { Schedule } from "../models/Schedule.model";
 import { ApiError } from "../utils/ApiError";
 
-export interface CreateConsultationRequest{
-    startTime: Date,
-    endTime: Date,
-    consultationType: string,
-    status: string,
-    notes?: string,
-    prescription?: object,
-    advice?: string
+export interface CreateConsultationRequest {
+  startTime: Date;
+  endTime: Date;
+  consultationType: string;
+  status: string;
+  medications?: string[];
+  notes?: string;
+  advice?: string;
 }
 
-export enum ConsultationStatus{
-    PENDING = "PENDING",
-    COMPLETED = "COMPLETED",
-    CANCELLED = "CANCELLED"
+export enum ConsultationStatus {
+  PENDING = "PENDING",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
 }
-export class ConsultationService{
-    static async createConsulatation(userId: string, doctorId: string , req: CreateConsultationRequest){
-        const consulatation = await Consultation.create({
-            userId : userId,
-            doctorId: doctorId,
-            startTime: req.startTime,
-            // endTime: req.endTime,
-            consultationType: req.consultationType,
-            status: ConsultationStatus.PENDING,
-        });
+export class ConsultationService {
+  static async createConsultation(
+    userId: string,
+    doctorId: string,
+    req: CreateConsultationRequest
+  ) {
+    const consultation = await Consultation.create({
+      userId: userId,
+      doctorId: doctorId,
+      startTime: req.startTime,
+      // endTime: req.endTime,
+      consultationType: req.consultationType,
+      status: ConsultationStatus.PENDING,
+    });
 
-        return consulatation;
+    const schedule = await Schedule.findOne({
+      doctorId: doctorId,
+      date: req.startTime,
+    }).lean();
+
+    return consultation;
+  }
+
+  static async endConsultation(id: string) {
+    const updateConsultation = await Consultation.findByIdAndUpdate(id, {
+      $set: {
+        endTime: new Date(),
+        status: ConsultationStatus.COMPLETED,
+      },
+    });
+
+    if (!updateConsultation) {
+      throw new ApiError(404, "Consultation not found");
     }
 
-    static async updateConsultation(id: string, req: CreateConsultationRequest){
-        const consultation : IConsultation | null = await Consultation.findById(id).lean();
-        if(!consultation){
-            throw new ApiError(400,"No consultation found");
-        }
-        consultation.endTime = req.endTime;
-        consultation.consultationType = req.consultationType;
-        consultation.status = req.status;
-        consultation.notes = req.notes;
-        consultation.prescription = req.prescription;
-        consultation.advice = req.advice;
-        await consultation.save();
-        return consultation;
+    return updateConsultation;
+  }
+  static async addNoteToConsultation(
+    id: string,
+    req: CreateConsultationRequest
+  ) {
+    const updateConsultation = await Consultation.findByIdAndUpdate(id, {
+      $push: {
+        consultNotes: {
+          medications: req.medications,
+          notes: req.notes,
+          advice: req.advice,
+          createdAt: new Date(),
+        },
+      },
+    });
+
+    if (!updateConsultation) {
+      throw new ApiError(404, "Consultation not found");
     }
+
+    return updateConsultation;
+  }
 }

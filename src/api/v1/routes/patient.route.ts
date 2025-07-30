@@ -17,9 +17,9 @@ router.patch("/patientInfoUpdate", patientProfileUpdate);
 // for home page
 
 // for appointment page
-// router.get("/consultaions/upcoming", getUpcomingConsulations)
-// router.get("/consultaions/past", getPastConsulations)
-// router.get("/consultaions/filter", getFilteredConsulations)
+// router.get("/consultations/upcoming", getUpcomingConsultations)
+// router.get("/consultations/past", getPastConsultations)
+// router.get("/consultations/filter", getFilteredConsultations)
 
 //for chat page
 // router.get("/chats", getChats)
@@ -30,6 +30,15 @@ router.patch("/patientInfoUpdate", patientProfileUpdate);
 // router.get('doctor/:id', viewDoctorProfile);
 
 // for booking appointment
-router.get("/consultations/booking", createConsultation);
+router.post("/consultations/booking/:doctorId", createConsultation);
 
 export default router;
+
+
+// patient booking appointment -> create consultation //doing
+// patient create healthconcerns -> create healthconcerns //done
+// patient view consultation -> view consultation
+// patient end consultation -> end consultation
+// patient cancel consultation -> cancel consultation
+// patient view consultation notes -> view consultation notes
+// patient review doctor -> review doctor // done 
