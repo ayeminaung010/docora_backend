@@ -5,6 +5,7 @@ import {
 } from "../controllers/patient.controller";
 import { authenticate } from "../middlewares/auth.middleware";
 import { authorize } from "../middlewares/authorize.middleware";
+import { createConsultation } from "../controllers/consulatations.controller";
 
 const router = Router();
 // router.use(authorize(["PATIENT"]));
@@ -26,11 +27,9 @@ router.patch("/patientInfoUpdate", patientProfileUpdate);
 
 //for profile page
 
-
 // router.get('doctor/:id', viewDoctorProfile);
 
 // for booking appointment
-// router.get("/consultaions/booking", createConsulation)
-
+router.get("/consultations/booking", createConsultation);
 
 export default router;

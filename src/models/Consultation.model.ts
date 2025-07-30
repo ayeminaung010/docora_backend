@@ -6,11 +6,11 @@ export interface IConsultation extends Document {
   doctorId: Types.ObjectId;
   // scheduleId: Types.ObjectId;
   startTime: Date;
-  endTime: Date;
+  endTime?: Date;
   consultationType: string;
   status: string;
-  notes: string;
-  prescription: Object;
+  notes?: string;
+  prescription?: Object;
   advice?: string;
 }
 
@@ -40,7 +40,7 @@ const consultationSchema = new Schema<IConsultation>(
 
     endTime: {
       type: Date,
-      required: true,
+      // required: true,
       validate: {
         validator: function (this: IConsultation, value: Date) {
           // Ensure endTime is after startTime
@@ -57,16 +57,15 @@ const consultationSchema = new Schema<IConsultation>(
     status: {
       type: String,
       required: true,
+      enum: ["PENDING", "COMPLETED", "CANCELLED"],
       trim: true,
     },
     notes: {
       type: String,
-      required: true,
       trim: true,
     },
     prescription: {
       type: Object,
-      required: true,
     },
     advice: {
       type: String,

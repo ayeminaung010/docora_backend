@@ -3,6 +3,7 @@ import { profileUpdate, verifyIdentityDoctor, viewUserDetails,getPopularDoctors 
 import { authenticate } from "../middlewares/auth.middleware";
 import { authorize } from "../middlewares/authorize.middleware";
 import { viewScheduleDoctor } from "../controllers/schedule.controller";
+import { updateConsultation } from "../controllers/consulatations.controller";
 
 
 const router = Router();
@@ -17,6 +18,7 @@ router.post("/verifyIdentity" , verifyIdentityDoctor );
 
 //for appointment page
 // router.get("/consulstaions/upcoming", getUpcomingConsulations)
+router.post("/consultation/note/create", updateConsultation);
 // router.get("/consulstaions/past", getPastConsulations)
 // router.get("/consulstaions/filter", getFilteredConsulations)
 router.get("/schedule/:doctorId", viewScheduleDoctor);
