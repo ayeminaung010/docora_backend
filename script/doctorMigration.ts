@@ -4,21 +4,14 @@ import { Doctor } from "../src/models/Doctor.model";
 import { faker } from "@faker-js/faker";
 
 const medicalSpecialties = [
-  'Cardiology',
+  'General Physician',
   'Dermatology',
-  'Emergency Medicine',
-  'Family Medicine',
-  'Internal Medicine',
   'Neurology',
-  'Oncology',
-  'Orthopedics',
-  'Pediatrics',
   'Psychiatry',
   'Radiology',
   'Surgery',
-  'Urology',
-  'Gynecology',
-  'Anesthesiology'
+  'Cardiology',
+  'Dental'
 ];
 
 const countries = [
