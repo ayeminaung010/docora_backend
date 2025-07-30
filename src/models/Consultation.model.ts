@@ -23,8 +23,8 @@ export interface IConsultation extends Document {
   endTime?: Date;
   consultationType: string;
   status: string;
-  consultNotes: INote[];
-  healthConcerns: IHealthConcerns[];
+  consultNotes: INote;
+  healthConcerns: IHealthConcerns;
 }
 
 const consultationSchema = new Schema<IConsultation>(
@@ -78,25 +78,22 @@ const consultationSchema = new Schema<IConsultation>(
       enum: ["PENDING", "COMPLETED", "CANCELLED"],
       trim: true,
     },
-    consultNotes: [
-      {
-        medications: [String],
-        notes: String,
-        advice: String,
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
+    consultNotes: {
+      medications: [String],
+      notes: String,
+      advice: String,
+      createdAt: {
+        type: Date,
+        default: Date.now,
       },
-    ],
-    healthConcerns: [
-      {
-        symptoms: String,
-        duration: String,
-        medications: [String],
-        attachments: [String],
-      },
-    ],
+    },
+
+    healthConcerns: {
+      symptoms: String,
+      duration: String,
+      medications: [String],
+      attachments: [String],
+    },
   },
   {
     timestamps: true,

@@ -1,15 +1,22 @@
-import { Consultation, IConsultation } from "../models/Consultation.model";
+import {
+  Consultation,
+} from "../models/Consultation.model";
 import { Schedule } from "../models/Schedule.model";
 import { ApiError } from "../utils/ApiError";
 
 export interface CreateConsultationRequest {
   startTime: Date;
   endTime: Date;
+  date: Date;
   consultationType: string;
   status: string;
-  medications?: string[];
+  medications?: string[]; // consultNotes
   notes?: string;
   advice?: string;
+  symptoms: string;
+  duration: string;
+  currentMedications: string[]; // healthConcerns
+  attachments: string[];
 }
 
 export enum ConsultationStatus {
@@ -23,19 +30,35 @@ export class ConsultationService {
     doctorId: string,
     req: CreateConsultationRequest
   ) {
+    const healthConcern = {
+      symptoms: req.symptoms,
+      duration: req.duration,
+      medications: req.currentMedications,
+      attachments: req.attachments,
+    };
+
+    const schedule = await Schedule.findOne({
+      doctorId: doctorId,
+      date: req.date,
+    });
+
+    if (!schedule) {
+      throw new ApiError(404, "Schedule not found");
+    }
+
+    if (schedule.fullTimeSlots.length === 0) {
+      throw new ApiError(400, "No time slots available for this schedule");
+    }
+    // book logic here 
+
     const consultation = await Consultation.create({
       userId: userId,
       doctorId: doctorId,
       startTime: req.startTime,
-      // endTime: req.endTime,
       consultationType: req.consultationType,
       status: ConsultationStatus.PENDING,
+      healthConcerns: healthConcern,
     });
-
-    const schedule = await Schedule.findOne({
-      doctorId: doctorId,
-      date: req.startTime,
-    }).lean();
 
     return consultation;
   }
