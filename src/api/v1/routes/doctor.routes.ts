@@ -9,6 +9,8 @@ import {
     verifyIdentityDoctor,
     viewUserDetails,
 } from "../controllers/doctor.controller";
+import { authenticate } from "../middlewares/auth.middleware";
+import { authorize } from "../middlewares/authorize.middleware";
 import { viewScheduleDoctor } from "../controllers/schedule.controller";
 import { authenticate } from "../middlewares/auth.middleware";
 

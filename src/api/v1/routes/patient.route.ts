@@ -1,8 +1,12 @@
 import { Router } from "express";
 import { createConsultation } from "../controllers/consultations.controller";
 import {
+  filterBySpecialty,
+  getPopularDoctors,
   patientDetailForm,
   patientProfileUpdate,
+  searchDoctorsByName,
+  searchDoctorsByNameAndSpecialty,
 } from "../controllers/patient.controller";
 import { authenticate } from "../middlewares/auth.middleware";
 
@@ -12,6 +16,12 @@ router.use(authenticate);
 
 router.post("/patientDetailForm", patientDetailForm);
 router.patch("/patientInfoUpdate", patientProfileUpdate);
+router.get("/popularDoctors", getPopularDoctors);
+router.get("/search/doctors/name", searchDoctorsByName);
+router.get("/search/:specialty/name", searchDoctorsByNameAndSpecialty);
+router.get("/search/:specialty", filterBySpecialty);
+
+
 
 // for home page
 

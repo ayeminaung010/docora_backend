@@ -146,17 +146,7 @@ export class DoctorService {
     }
   }
 
-  static async popularDoctors(limit: number = 5):Promise<any>{
-  const popularDoctors = await Doctor.find({ isVerified: true })
-    .populate('userId', 'name profileUrl') 
-    .sort({ averageRating: -1, yearsOfExperience: -1 }) 
-    .limit(limit)
-    .select('speciality averageRating')
-    .lean(); 
-
-  return popularDoctors;
-
-  }
+  
 
   static async getPatientDetails(userId: string, patientId: string): Promise<any> {
     const [userDetails, patientDetails] = await Promise.all([
