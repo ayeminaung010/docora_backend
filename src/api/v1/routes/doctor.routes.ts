@@ -1,17 +1,16 @@
 import { Router } from "express";
 import {
-  profileUpdate,
-  verifyIdentityDoctor,
-  viewUserDetails,
-  getPopularDoctors,
-} from "../controllers/doctor.controller";
-import { authenticate } from "../middlewares/auth.middleware";
-import { authorize } from "../middlewares/authorize.middleware";
-import { viewScheduleDoctor } from "../controllers/schedule.controller";
+    addNoteToConsultation,
+    endConsultation,
+} from "../controllers/consultations.controller";
 import {
-  addNoteToConsultation,
-  endConsultation,
-} from "../controllers/consulatations.controller";
+    getPopularDoctors,
+    profileUpdate,
+    verifyIdentityDoctor,
+    viewUserDetails,
+} from "../controllers/doctor.controller";
+import { viewScheduleDoctor } from "../controllers/schedule.controller";
+import { authenticate } from "../middlewares/auth.middleware";
 
 const router = Router();
 
@@ -24,9 +23,9 @@ router.post("/verifyIdentity", verifyIdentityDoctor);
 // router.get("/notificatons", getNotifications) // go to noti page
 
 //for appointment page
-// router.get("/consultations/upcoming", getUpcomingConsulations)
-// router.get("/consultations/past", getPastConsulations)
-// router.get("/consultations/filter", getFilteredConsulations)
+// router.get("/consultations/upcoming", getUpcomingConsultations)
+// router.get("/consultations/past", getPastConsultations)
+// router.get("/consultations/filter", getFilteredConsultations)
 
 //for consultation page
 router.post("/consultation/end/:id", endConsultation);

@@ -1,11 +1,10 @@
 import { Router } from "express";
+import { createConsultation } from "../controllers/consultations.controller";
 import {
   patientDetailForm,
   patientProfileUpdate,
 } from "../controllers/patient.controller";
 import { authenticate } from "../middlewares/auth.middleware";
-import { authorize } from "../middlewares/authorize.middleware";
-import { createConsultation } from "../controllers/consulatations.controller";
 
 const router = Router();
 // router.use(authorize(["PATIENT"]));
@@ -41,4 +40,4 @@ export default router;
 // patient end consultation -> end consultation
 // patient cancel consultation -> cancel consultation
 // patient view consultation notes -> view consultation notes
-// patient review doctor -> review doctor // done 
+// patient review doctor -> review doctor // done
