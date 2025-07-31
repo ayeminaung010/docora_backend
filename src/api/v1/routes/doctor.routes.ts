@@ -4,7 +4,6 @@ import {
     endConsultation,
 } from "../controllers/consultations.controller";
 import {
-    getPopularDoctors,
     profileUpdate,
     verifyIdentityDoctor,
     viewUserDetails,
@@ -12,7 +11,7 @@ import {
 import { authenticate } from "../middlewares/auth.middleware";
 import { authorize } from "../middlewares/authorize.middleware";
 import { viewScheduleDoctor } from "../controllers/schedule.controller";
-import { authenticate } from "../middlewares/auth.middleware";
+import { getPopularDoctors } from "../controllers/patient.controller";
 
 const router = Router();
 
