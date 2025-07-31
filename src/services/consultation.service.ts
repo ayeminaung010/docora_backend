@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { Consultation } from "../models/Consultation.model";
 import { Schedule } from "../models/Schedule.model";
 import { ApiError } from "../utils/ApiError";
@@ -137,5 +137,141 @@ export class ConsultationService {
     }
 
     return updateConsultation;
+  }
+
+  static async getUpcomingConsultations(userId: string) {
+    const startToday = new Date();
+    startToday.setUTCHours(0, 0, 0, 0);
+
+    // const endToday = new Date(startToday);
+    // endToday.setUTCHours(23, 59, 59, 999);
+
+    const patientObjectId = new Types.ObjectId(userId);
+
+    const upcomingConsultations = await Consultation.aggregate([
+      {
+        $match: {
+          patientId: patientObjectId,
+          status: ConsultationStatus.PENDING,
+          startTime: {
+            $gte: startToday,
+            // $lt: endToday,
+          },
+        },
+      },
+      {
+          $lookup: {
+              from: "users", // The actual name of the users collection in MongoDB
+              localField: "doctorId",
+              foreignField: "_id",
+              as: "userDoc" // A temporary array to hold the found user document
+          }
+      },
+      {
+          $lookup: {
+              from: "doctors", // The actual name of the doctors collection
+              localField: "doctorId",
+              foreignField: "userId", 
+              as: "doctorDoc" // A temporary array for the doctor document
+          }
+      },
+      {
+          $unwind: { path: "$userDoc", preserveNullAndEmptyArrays: true }
+      },
+      {
+          $unwind: { path: "$doctorDoc", preserveNullAndEmptyArrays: true }
+      },
+      {
+          $project: {
+              // Include the consultation fields you want
+              _id: 1,
+              startTime: 1,
+              consultationType: 1,
+              status: 1,
+
+              // Create the 'doctorDetails' object by merging fields from the lookups
+              doctorDetails: {
+                  name: "$userDoc.name",
+                  profileUrl: "$userDoc.profileUrl",
+                  // workPlace: "$doctorDoc.workPlace",
+                  // graduateSchool: "$doctorDoc.graduateSchool",
+                  speciality: "$doctorDoc.speciality",
+                  yearsOfExperience: "$doctorDoc.yearsOfExperience",
+                  averageRating: "$doctorDoc.averageRating",
+              }
+          }
+      }
+    ]);
+
+    if (!upcomingConsultations || upcomingConsultations.length === 0) {
+      throw new ApiError(404, "No upcoming consultations found");
+    }
+
+    return upcomingConsultations;
+  }
+
+  static async getPastConsultations(userId: string) {
+    //test with current date to next 3 days
+    const startToday = new Date();
+    startToday.setUTCHours(0, 0, 0, 0);
+
+    const patientObjectId = new Types.ObjectId(userId);
+
+    const pastConsultations = await Consultation.aggregate([
+      {
+        $match: {
+          patientId: patientObjectId,
+          status: ConsultationStatus.COMPLETED || ConsultationStatus.CANCELLED,
+          startTime: {
+            $lt: startToday,
+          },
+        },
+      },
+      {
+          $lookup: {
+              from: "users",
+              localField: "doctorId",
+              foreignField: "_id",
+              as: "userDoc"
+          }
+      },
+      {
+          $lookup: {
+              from: "doctors",
+              localField: "doctorId",
+              foreignField: "userId", 
+              as: "doctorDoc"
+          }
+      },
+      {
+          $unwind: { path: "$userDoc", preserveNullAndEmptyArrays: true }
+      },
+      {
+          $unwind: { path: "$doctorDoc", preserveNullAndEmptyArrays: true }
+      },
+      {
+          $project: {
+              _id: 1,
+              startTime: 1,
+              consultationType: 1,
+              status: 1,
+              consultNotes: 1,
+
+              doctorDetails: {
+                  name: "$userDoc.name",
+                  profileUrl: "$userDoc.profileUrl",
+                  speciality: "$doctorDoc.speciality",
+                  yearsOfExperience: "$doctorDoc.yearsOfExperience",
+                  averageRating: "$doctorDoc.averageRating",
+              }
+          }
+      }
+    ]);
+
+    if (!pastConsultations || pastConsultations.length === 0) {
+      throw new ApiError(404, "No past consultations found");
+    }
+
+    return pastConsultations;
   }
 }
