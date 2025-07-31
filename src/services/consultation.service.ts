@@ -32,24 +32,48 @@ export class ConsultationService {
     const session = await mongoose.startSession();
 
     session.startTransaction();
-    try{
+    try {
+      const requestDate = new Date(req.date);
+
+      // 1. Create the start of the day in UTC
+      const startOfDay = new Date(requestDate);
+      startOfDay.setUTCHours(0, 0, 0, 0);
+
+      // 2. Create the end of the day (which is the start of the next day)
+      const endOfDay = new Date(startOfDay);
+
+      endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);
+
       const updatedSchedule = await Schedule.findOneAndUpdate(
         {
           doctorId: doctorId,
-          date: req.date,
-          "fullTimeSlots.startTime": req.startTime,
-          "fullTimeSlots.isBooked": false,
+          date: {
+            $gte: startOfDay,
+            $lt: endOfDay,
+          },
+          fullTimeSlots: {
+            $elemMatch: {
+              startTime: req.startTime,
+              isBooked: false,
+              disabled: false,
+            },
+          },
         },
         {
-          $set: { "fullTimeSlots.$.isBooked": true },
+          $set: {
+            "fullTimeSlots.$.isBooked": true,
+            "fullTimeSlots.$.disabled": true,
+          },
         }
       );
+
       if (!updatedSchedule) {
         throw new ApiError(
           409,
-          "This time slot is not available or already booked."
+          "This time slot is not available or has already been booked."
         );
       }
+
       // collect the data from the request
       const healthConcern = {
         symptoms: req.symptoms,
@@ -58,8 +82,9 @@ export class ConsultationService {
         attachments: req.attachments,
       };
       const consultation = await Consultation.create({
-        userId: userId,
+        patientId: userId,
         doctorId: doctorId,
+        scheduleId: updatedSchedule?._id,
         startTime: req.startTime,
         consultationType: req.consultationType,
         status: ConsultationStatus.PENDING,
@@ -67,10 +92,13 @@ export class ConsultationService {
       });
 
       return consultation;
-    }catch(error) {
+    } catch (error: any) {
       await session.abortTransaction();
-      throw new ApiError(500, "Failed to create consultation: " + (error || "Unknown error"));
-    }finally{
+      throw new ApiError(
+        500,
+        "Failed to create consultation: " + (error?.message || "Unknown error")
+      );
+    } finally {
       session.endSession();
     }
   }
