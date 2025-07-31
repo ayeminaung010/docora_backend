@@ -2,7 +2,7 @@ import { Document,Schema,model, Types } from "mongoose";
 
 export interface IReview extends Document{
     _id: Types.ObjectId;
-    consultationId: Types.ObjectId;
+    consultationId?: Types.ObjectId;
     patientId: Types.ObjectId;
     doctorId: Types.ObjectId;
     rating: number;
@@ -15,12 +15,12 @@ const reviewSchema = new Schema<IReview>({
     consultationId: {
         type: Schema.Types.ObjectId,
         ref: "Consultation",
-        required: true,
+        // required: true,
         unique: true,
     },
     patientId: {
       type: Schema.Types.ObjectId,
-        ref: "Patient",
+        ref: "User",
         required: true,
     },
     doctorId: {

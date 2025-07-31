@@ -3,10 +3,12 @@ import { createConsultation } from "../controllers/consultations.controller";
 import {
   filterBySpecialty,
   getPopularDoctors,
+  giveDoctorReview,
   patientDetailForm,
   patientProfileUpdate,
   searchDoctorsByName,
   searchDoctorsByNameAndSpecialty,
+  viewDoctorProfile,
 } from "../controllers/patient.controller";
 import { authenticate } from "../middlewares/auth.middleware";
 
@@ -20,9 +22,8 @@ router.get("/popularDoctors", getPopularDoctors);
 router.get("/search/doctors/name", searchDoctorsByName);
 router.get("/search/:specialty/name", searchDoctorsByNameAndSpecialty);
 router.get("/search/:specialty", filterBySpecialty);
-
-
-
+router.get("/doctor/:id", viewDoctorProfile);
+router.post("/doctorReview",giveDoctorReview);
 // for home page
 
 // for appointment page
@@ -35,6 +36,7 @@ router.get("/search/:specialty", filterBySpecialty);
 // router.get("/chats/:chatId", viewChat)
 
 //for profile page
+
 
 // router.get('doctor/:id', viewDoctorProfile);
 

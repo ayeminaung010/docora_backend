@@ -3,6 +3,7 @@
   import { ApiError } from "../utils/ApiError";
   import { User } from "../models/User.model";
   import { Doctor } from "../models/Doctor.model";
+import { Review } from "../models/Review.model";
 
   export interface detailFormRequest {
     bloodType: string;
@@ -23,6 +24,13 @@
     allergies?: string[];
     chronicConditions?: string[];
     currentMedications?: string[];
+  }
+  export interface reviewRequest{
+    doctorId: Types.ObjectId;
+    consultationId?: Types.ObjectId;
+    rating: number;
+    comment?: string;
+    reviewTags: string[];
   }
 
   export class PatientService {
@@ -181,4 +189,58 @@ static async searchDoctorsByNameAndSpecialty(searchTerm: string, specialty: stri
   
   return filteredDoctors;
 }
+
+static async getDoctorDetails(userId: string, doctorId: string): Promise<any> {
+  const [userDetails, doctorDetails] = await Promise.all([
+    User.findById(userId).select("-password").lean(), 
+    Doctor.findOne({ _id: doctorId }).lean(),
+  ]);
+
+  if (!userDetails) {
+    throw new ApiError(404, "Doctor not found");
+  }
+  if (!doctorDetails) {
+    throw new ApiError(404, "Doctor details not found");
+  }
+  
+  const doctorData = {
+    name: userDetails.name,
+    profileUrl: userDetails.profileUrl,
+    workPlace: doctorDetails.workPlace,
+    graduateSchool: doctorDetails.graduateSchool,
+    speciality: doctorDetails.speciality,
+    yearsOfExperience: doctorDetails.yearsOfExperience,
+    averageRating: doctorDetails.averageRating,
+    consultationType: doctorDetails.consultationType,
+  };
+  
+  return doctorData;
+}
+
+static async giveDoctorReview(userId: string,req: reviewRequest): Promise<any>{
+if(!userId){
+  throw new ApiError(404, "Patient not found");
+
+}
+const patient = await Patient.findOne({userId: userId});
+if(!patient){
+  throw new ApiError(404, "Patient not found");
+}
+
+const reviewDetails={
+ doctorId: req.doctorId,
+ consultationId: req.consultationId,
+ patientId: userId,
+rating: req.rating,
+comment: req.comment,
+reviewTags: req.reviewTags,
+createdAt: new Date(),
+}
+
+await new Review(reviewDetails).save();
+return true;
+
+}
+
+
   }
