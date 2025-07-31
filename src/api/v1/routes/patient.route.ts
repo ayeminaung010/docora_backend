@@ -34,10 +34,10 @@ router.post("/consultations/booking/:doctorId", createConsultation);
 export default router;
 
 
-// patient booking appointment -> create consultation //doing
+// patient booking appointment -> create consultation //done
 // patient create healthconcerns -> create healthconcerns //done
 // patient view consultation -> view consultation
 // patient end consultation -> end consultation
 // patient cancel consultation -> cancel consultation
-// patient view consultation notes -> view consultation notes
+// patient view consultation notes -> view consultation notes 
 // patient review doctor -> review doctor // done
