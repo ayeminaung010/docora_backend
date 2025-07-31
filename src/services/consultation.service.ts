@@ -1,6 +1,5 @@
-import {
-  Consultation,
-} from "../models/Consultation.model";
+import mongoose from "mongoose";
+import { Consultation } from "../models/Consultation.model";
 import { Schedule } from "../models/Schedule.model";
 import { ApiError } from "../utils/ApiError";
 
@@ -30,37 +29,50 @@ export class ConsultationService {
     doctorId: string,
     req: CreateConsultationRequest
   ) {
-    const healthConcern = {
-      symptoms: req.symptoms,
-      duration: req.duration,
-      medications: req.currentMedications,
-      attachments: req.attachments,
-    };
+    const session = await mongoose.startSession();
 
-    const schedule = await Schedule.findOne({
-      doctorId: doctorId,
-      date: req.date,
-    });
+    session.startTransaction();
+    try{
+      const updatedSchedule = await Schedule.findOneAndUpdate(
+        {
+          doctorId: doctorId,
+          date: req.date,
+          "fullTimeSlots.startTime": req.startTime,
+          "fullTimeSlots.isBooked": false,
+        },
+        {
+          $set: { "fullTimeSlots.$.isBooked": true },
+        }
+      );
+      if (!updatedSchedule) {
+        throw new ApiError(
+          409,
+          "This time slot is not available or already booked."
+        );
+      }
+      // collect the data from the request
+      const healthConcern = {
+        symptoms: req.symptoms,
+        duration: req.duration,
+        medications: req.currentMedications,
+        attachments: req.attachments,
+      };
+      const consultation = await Consultation.create({
+        userId: userId,
+        doctorId: doctorId,
+        startTime: req.startTime,
+        consultationType: req.consultationType,
+        status: ConsultationStatus.PENDING,
+        healthConcerns: healthConcern,
+      });
 
-    if (!schedule) {
-      throw new ApiError(404, "Schedule not found");
+      return consultation;
+    }catch(error) {
+      await session.abortTransaction();
+      throw new ApiError(500, "Failed to create consultation: " + (error || "Unknown error"));
+    }finally{
+      session.endSession();
     }
-
-    if (schedule.fullTimeSlots.length === 0) {
-      throw new ApiError(400, "No time slots available for this schedule");
-    }
-    // book logic here 
-
-    const consultation = await Consultation.create({
-      userId: userId,
-      doctorId: doctorId,
-      startTime: req.startTime,
-      consultationType: req.consultationType,
-      status: ConsultationStatus.PENDING,
-      healthConcerns: healthConcern,
-    });
-
-    return consultation;
   }
 
   static async endConsultation(id: string) {

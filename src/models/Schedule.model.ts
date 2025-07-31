@@ -2,7 +2,8 @@ import { model, Schema, Types } from "mongoose";
 
 const timeSlotSchema = new Schema(
   {
-    time: { type: String, required: true },
+    startTime: { type: Date, required: true },
+    endTime: { type: Date, required: true },
     isBooked: { type: Boolean, default: false, required: true },
     disabled: { type: Boolean, default: false, required: true },
   },
@@ -10,7 +11,8 @@ const timeSlotSchema = new Schema(
 );
 
 export interface ITimeSlot extends Types.Subdocument {
-  time: string;
+  startTime: Date;
+  endTime: Date;
   isBooked: boolean;
   disabled: boolean;
 }
