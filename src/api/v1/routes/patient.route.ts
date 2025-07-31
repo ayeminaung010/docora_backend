@@ -2,10 +2,12 @@ import { Router } from "express";
 import {
   filterBySpecialty,
   getPopularDoctors,
+  giveDoctorReview,
   patientDetailForm,
   patientProfileUpdate,
   searchDoctorsByName,
   searchDoctorsByNameAndSpecialty,
+  viewDoctorProfile,
 } from "../controllers/patient.controller";
 import { authenticate } from "../middlewares/auth.middleware";
 import { authorize } from "../middlewares/authorize.middleware";
@@ -20,9 +22,8 @@ router.get("/popularDoctors", getPopularDoctors);
 router.get("/search/doctors/name", searchDoctorsByName);
 router.get("/search/:specialty/name", searchDoctorsByNameAndSpecialty);
 router.get("/search/:specialty", filterBySpecialty);
-
-
-
+router.get("/doctor/:id", viewDoctorProfile);
+router.post("/doctorReview",giveDoctorReview);
 // for home page
 
 // for appointment page
@@ -37,7 +38,6 @@ router.get("/search/:specialty", filterBySpecialty);
 //for profile page
 
 
-// router.get('doctor/:id', viewDoctorProfile);
 
 // for booking appointment
 // router.get("/consultaions/booking", createConsulation)

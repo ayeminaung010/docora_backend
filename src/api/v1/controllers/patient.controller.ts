@@ -129,3 +129,45 @@ export const searchDoctorsByNameAndSpecialty = asyncHandler(
       .json(new ApiResponse(200, doctors, "Search results loaded successfully"));
   }
 );
+
+export const viewDoctorProfile = asyncHandler(
+  async(req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?.userId;
+    const { id } = req.params;
+    
+    if (!userId) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "User ID is required"));
+    }
+    
+    const doctorDetails = await PatientService.getDoctorDetails(userId, id);
+
+    if (!doctorDetails) {
+      return res
+        .status(404)
+        .json(new ApiResponse(404, {}, "Doctor not found"));
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, doctorDetails, "Doctor details retrieved successfully"));
+  }
+);
+
+
+export const giveDoctorReview = asyncHandler(async(req: AuthenticatedRequest, res: Response)=> {
+  const userId= req.user?.userId;
+  if (!userId) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "User ID is required"));
+    }
+    const review = await PatientService.giveDoctorReview(userId, req.body);
+
+     return res
+      .status(200)
+      .json(new ApiResponse(200, review, "Review data saved"));
+  
+
+});
