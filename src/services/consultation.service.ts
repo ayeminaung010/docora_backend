@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Consultation } from "../models/Consultation.model";
 import { Schedule } from "../models/Schedule.model";
 import { ApiError } from "../utils/ApiError";
+import { User } from "../models/User.model";
 
 export interface CreateConsultationRequest {
   startTime: Date;
@@ -109,5 +110,35 @@ export class ConsultationService {
     }
 
     return updateConsultation;
+  }
+
+  static async viewConsultation(userId: string,doctorId: string): Promise<any>{
+
+
+     const [consultationData, userDetails] = await Promise.all([
+          Consultation.findOne({patientId: userId, doctorId: doctorId}).lean(), 
+          User.findOne({_id: userId}).select("-password").lean(),
+        ]);
+    
+        if (!userDetails) {
+          throw new ApiError(404, "user not find");
+        }
+        if (!consultationData) {
+          throw new ApiError(404, "Patient details not found");
+        }
+        // const consultationHistory = await Consultation.find({ patientId }).lean();
+        const consultationDetail = {
+          name: userDetails.name,
+          profileUrl: userDetails.profileUrl,
+          gender: userDetails.gender,
+          age: userDetails.age,
+          medications: consultationData.consultNotes.medications,
+          notes: consultationData.consultNotes.notes,
+          advice: consultationData.consultNotes.advice
+        };
+        return consultationDetail;
+
+
+  
   }
 }

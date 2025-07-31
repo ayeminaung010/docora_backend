@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
     addNoteToConsultation,
     endConsultation,
+    viewConsultation,
 } from "../controllers/consultations.controller";
 import {
     profileUpdate,
@@ -51,7 +52,7 @@ router.get("/schedule/:doctorId", viewScheduleDoctor);
 router.patch("/profile/update", profileUpdate);
 router.get("/popularDoctors", getPopularDoctors);
 router.get("/user/details/:id", viewUserDetails);
-
+router.get("/consultationData/:id",viewConsultation);
 export default router;
 
 
