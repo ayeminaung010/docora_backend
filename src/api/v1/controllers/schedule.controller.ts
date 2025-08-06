@@ -7,7 +7,7 @@ import { ApiResponse } from "../../../utils/ApiResponse";
 
 export const viewScheduleDoctor = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const { doctorId } = req.params;
+    const doctorId = req.user?.id;
     console.log("Doctor ID:", doctorId);
 
     if (!doctorId) {
@@ -24,6 +24,30 @@ export const viewScheduleDoctor = asyncHandler(
     }
     return res
       .status(200)
-      .json(new ApiResponse(200, allSchedules, "Schedule fetched successfully"));
+      .json(
+        new ApiResponse(200, allSchedules, "Schedule fetched successfully")
+      );
+  }
+);
+
+export const createSchedule = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const doctorId = req.user?.id;
+    const scheduleData = req.body;
+
+    if (!doctorId || !scheduleData) {
+      return res.status(400).json(new ApiError(400, "Invalid request data"));
+    }
+
+    //go to service and create schedule
+    const newSchedule = await ScheduleService.createSchedule(doctorId, scheduleData);
+
+    if (!newSchedule) {
+      return res.status(500).json(new ApiError(500, "Failed to create schedule"));
+    }
+
+    return res
+      .status(201)
+      .json(new ApiResponse(201, newSchedule, "Schedule created successfully"));
   }
 );

@@ -1,9 +1,12 @@
 import { Router } from "express";
 import {
     addNoteToConsultation,
+    cancelConsultation,
     endConsultation,
     getPastConsultationsForDoctor,
     getUpcomingConsultationsForDoctor,
+    viewConsultationDetails,
+    viewConsultationNote,
 } from "../controllers/consultations.controller";
 import {
     profileUpdate,
@@ -12,7 +15,7 @@ import {
 } from "../controllers/doctor.controller";
 import { authenticate } from "../middlewares/auth.middleware";
 import { authorize } from "../middlewares/authorize.middleware";
-import { viewScheduleDoctor } from "../controllers/schedule.controller";
+import { createSchedule, viewScheduleDoctor } from "../controllers/schedule.controller";
 import { getPopularDoctors } from "../controllers/patient.controller";
 
 const router = Router();
@@ -28,16 +31,19 @@ router.post("/verifyIdentity", verifyIdentityDoctor);
 //for appointment page
 router.get("/consultations/upcoming", getUpcomingConsultationsForDoctor)
 router.get("/consultations/past", getPastConsultationsForDoctor)
+router.get("/consultation/details/:id", viewConsultationDetails) // view consultation details
 // router.get("/consultations/filter", getFilteredConsultations)
+router.post("/consultation/cancel/:id", cancelConsultation);
 
 //for consultation page
 router.post("/consultation/end/:id", endConsultation);
 router.post("/consultation/note/create/:id", addNoteToConsultation);
+router.get("/consultation/note/:id", viewConsultationNote);
 
 
 // for scheduling page 
 router.get("/schedule/:doctorId", viewScheduleDoctor);
-// router.post("/schedule/create", createSchedule)
+router.post("/schedule/create", createSchedule) // not done 
 // router.post("/schedule/delete", deleteSchedule)
 
 //for chat page
@@ -57,7 +63,9 @@ router.get("/user/details/:id", viewUserDetails);
 export default router;
 
 
-// doctor consulation 
-// doctor end consulation -> end consultation
-// doctor create consulation note 
-// doctor view consulation note
+// doctor consultation
+// doctor view consultation details // health concerns data 
+// doctor end consultation -> end consultation // done
+// doctor create consultation note // done
+// patient cancel consultation -> cancel consultation //done
+// doctor view consultation note  // done

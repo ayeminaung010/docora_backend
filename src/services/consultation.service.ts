@@ -24,6 +24,19 @@ export enum ConsultationStatus {
   CANCELLED = "CANCELLED",
 }
 export class ConsultationService {
+
+  static async viewConsultationDetails(id: string) {
+    const consultation = await Consultation.findById(id)
+      .populate("patientId", "name profileUrl age gender" , "User")
+      // .populate("doctorId", "name profileUrl");
+
+    if (!consultation) {
+      throw new ApiError(404, "Consultation not found");
+    }
+
+    return consultation;
+  }
+
   static async createConsultation(
     userId: string,
     doctorId: string,
@@ -117,6 +130,26 @@ export class ConsultationService {
 
     return updateConsultation;
   }
+
+  static async cancelConsultation(id: string, userId: string | undefined  , req: { cancellationReason?: string; cancellationType?: string }) {
+    const updateConsultation = await Consultation.findByIdAndUpdate(id, {
+      $set: {
+        status: ConsultationStatus.CANCELLED,
+        cancelConsultation: {
+          cancelledBy: userId,
+          cancellationReason: req?.cancellationReason,
+          cancellationType: req?.cancellationType,
+        },
+      },
+    });
+
+    if (!updateConsultation) {
+      throw new ApiError(404, "Consultation not found");
+    }
+
+    return updateConsultation;
+  }
+
   static async addNoteToConsultation(
     id: string,
     req: CreateConsultationRequest
@@ -137,6 +170,16 @@ export class ConsultationService {
     }
 
     return updateConsultation;
+  }
+
+  static async viewConsultationNote(id: string) {
+    const consultation = await Consultation.findById(id).populate("consultNotes");
+
+    if (!consultation) {
+      throw new ApiError(404, "Consultation not found");
+    }
+
+    return consultation.consultNotes;
   }
 
   static async getUpcomingConsultations(userId: string) {
@@ -274,7 +317,6 @@ export class ConsultationService {
 
     return pastConsultations;
   }
-
 
   static async getUpcomingConsultationsForDoctor(doctorId: string) {
     const startToday = new Date();
