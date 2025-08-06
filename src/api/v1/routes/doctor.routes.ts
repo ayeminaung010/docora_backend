@@ -7,6 +7,7 @@ import {
     getUpcomingConsultationsForDoctor,
     viewConsultationDetails,
     viewConsultationNote,
+    viewConsultation,
 } from "../controllers/consultations.controller";
 import {
     profileUpdate,
@@ -59,7 +60,7 @@ router.post("/schedule/create", createSchedule) // not done
 router.patch("/profile/update", profileUpdate);
 router.get("/popularDoctors", getPopularDoctors);
 router.get("/user/details/:id", viewUserDetails);
-
+router.get("/consultationData/:id",viewConsultation);
 export default router;
 
 

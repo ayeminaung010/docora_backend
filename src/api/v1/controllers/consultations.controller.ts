@@ -90,6 +90,22 @@ export const viewConsultationNote = asyncHandler(
   }
 );
 
+export const viewConsultation = asyncHandler(async (req: AuthenticatedRequest, res: Response)=> {
+    const userId = req.user?.userId;
+    const {id}= req.params;
+
+     if (!userId) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "User ID is required"));
+    }
+    const result = await ConsultationService.viewConsultation(userId,id);
+
+     return res
+      .status(200)
+      .json(new ApiResponse(200, result, "Consultation data get"));
+
+});
 export const getUpcomingConsultations = asyncHandler(async(req: AuthenticatedRequest, res: Response) => {
   const userId = req.user?.userId;
 
