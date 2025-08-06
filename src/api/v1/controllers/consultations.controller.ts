@@ -4,6 +4,16 @@ import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 import { ApiResponse } from "../../../utils/ApiResponse";
 import { ConsultationService } from "../../../services/consultation.service";
 
+export const viewConsultationDetails = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    const result = await ConsultationService.viewConsultationDetails(id);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, result, "Consultation details retrieved successfully"));
+  }
+);
+
 export const createConsultation = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const { doctorId } = req.params;
@@ -42,6 +52,21 @@ export const endConsultation = asyncHandler(
   }
 );
 
+export const cancelConsultation = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    const userId = req.user?.userId;
+    const { cancellationReason, cancellationType } = req.body;
+    const result = await ConsultationService.cancelConsultation(id, userId, {
+      cancellationReason,
+      cancellationType,
+    });
+    return res
+      .status(200)
+      .json(new ApiResponse(200, result, "Consultation cancelled successfully"));
+  }
+);
+
 export const addNoteToConsultation = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
@@ -52,6 +77,16 @@ export const addNoteToConsultation = asyncHandler(
     return res
       .status(200)
       .json(new ApiResponse(200, result, "Consultation updated successfully"));
+  }
+);
+
+export const viewConsultationNote = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    const result = await ConsultationService.viewConsultationNote(id);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, result, "Consultation note retrieved successfully"));
   }
 );
 
@@ -100,7 +135,6 @@ export const getPastConsultations = asyncHandler(async(req: AuthenticatedRequest
     .status(200)
     .json(new ApiResponse(200, result, "Past consultations retrieved successfully"));
 });
-
 
 export const getUpcomingConsultationsForDoctor = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {

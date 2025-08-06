@@ -14,6 +14,12 @@ export interface IHealthConcerns extends Types.Subdocument {
   attachments: string[];
 }
 
+export interface ICancelConsultation extends Types.Subdocument {
+  cancelledBy?: Types.ObjectId;
+  cancellationReason?: string;
+  cancellationType?: "CANCELLED_BY_PATIENT" | "CANCELLED_BY_DOCTOR" | "PATIENT_NO_SHOW" | "DOCTOR_UNAVAILABLE" | "SYSTEM_ERROR" | "OTHER";
+}
+
 export interface IConsultation extends Document {
   _id: Types.ObjectId;
   patientId: Types.ObjectId;
@@ -25,6 +31,7 @@ export interface IConsultation extends Document {
   status: string;
   consultNotes: INote;
   healthConcerns: IHealthConcerns;
+  cancelConsultation?: ICancelConsultation;
 }
 
 const consultationSchema = new Schema<IConsultation>(
@@ -55,7 +62,6 @@ const consultationSchema = new Schema<IConsultation>(
         message: "Start time cannot be in the past",
       },
     },
-
     endTime: {
       type: Date,
       required: false,
@@ -87,12 +93,34 @@ const consultationSchema = new Schema<IConsultation>(
         default: Date.now,
       },
     },
-
     healthConcerns: {
       symptoms: String,
       duration: String,
       medications: [String],
       attachments: [String],
+    },
+    cancelConsultation: {
+      cancelledBy: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: false,
+      },
+      cancellationReason: {
+        type: String,
+        required: false,
+      },
+      cancellationType: {
+        type: String,
+        required: false,
+        enum: [
+          "CANCELLED_BY_PATIENT",
+          "CANCELLED_BY_DOCTOR",
+          "PATIENT_NO_SHOW",
+          "DOCTOR_UNAVAILABLE",
+          "SYSTEM_ERROR",
+          "OTHER",
+        ],
+      },
     },
   },
   {

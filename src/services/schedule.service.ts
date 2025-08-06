@@ -23,4 +23,14 @@ export class ScheduleService {
 
     return allSchedules;
   }
+
+  static async createSchedule(doctorId: string, scheduleData: any) {
+    const newSchedule = new Schedule({
+      doctorId,
+      ...scheduleData,
+    });
+
+    await newSchedule.save();
+    return newSchedule;
+  }
 }

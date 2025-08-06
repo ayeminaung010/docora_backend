@@ -27,12 +27,12 @@ async function runAllMigrations() {
     // await runDoctorMigration();
     
     // Step 3: Create schedules (requires doctors to exist)
-    console.log("--- Running Schedule Migration ---");
-    await runScheduleSeed();
+    // console.log("--- Running Schedule Migration ---");
+    // await runScheduleSeed();
     
     // Step 4: Create consultations (requires users and schedules to exist)
     // console.log("--- Running Consultation Migration ---");
-    // await runConsultationMigration();
+    await runConsultationMigration();
 
     console.log("All migrations completed successfully!");
 
