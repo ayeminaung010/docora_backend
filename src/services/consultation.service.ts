@@ -274,4 +274,111 @@ export class ConsultationService {
 
     return pastConsultations;
   }
+
+
+  static async getUpcomingConsultationsForDoctor(doctorId: string) {
+    const startToday = new Date();
+    startToday.setUTCHours(0, 0, 0, 0);
+
+    // const endToday = new Date(startToday);
+    // endToday.setUTCHours(23, 59, 59, 999);
+
+    const doctorObjectId = new Types.ObjectId(doctorId);
+
+    const upcomingConsultations = await Consultation.aggregate([
+      {
+        $match: {
+          doctorId: doctorObjectId,
+          status: ConsultationStatus.PENDING,
+          startTime: {
+            $gte: startToday,
+            // $lt: endToday,
+          },
+        },
+      },
+      {
+          $lookup: {
+              from: "users",
+              localField: "patientId",
+              foreignField: "_id",
+              as: "userDoc"
+          }
+      },
+      {
+          $unwind: { path: "$userDoc", preserveNullAndEmptyArrays: true }
+      },
+      {
+          $project: {
+              _id: 1,
+              startTime: 1,
+              consultationType: 1,
+              status: 1,
+
+              patientDetails: {
+                  name: "$userDoc.name",
+                  profileUrl: "$userDoc.profileUrl",
+                  age: "$userDoc.age",
+                  gender: "$userDoc.gender",
+              }
+          }
+      }
+    ]);
+
+    if (!upcomingConsultations || upcomingConsultations.length === 0) {
+      throw new ApiError(404, "No upcoming consultations found");
+    }
+
+    return upcomingConsultations;
+  }
+
+  static async getPastConsultationsForDoctor(doctorId: string) {
+    const startToday = new Date();
+    startToday.setUTCHours(0, 0, 0, 0);
+
+    const doctorObjectId = new Types.ObjectId(doctorId);
+
+    const pastConsultations = await Consultation.aggregate([
+      {
+        $match: {
+          doctorId: doctorObjectId,
+          status: ConsultationStatus.COMPLETED || ConsultationStatus.CANCELLED,
+          startTime: {
+            $lt: startToday,
+          },
+        },
+      },
+      {
+          $lookup: {
+              from: "users",
+              localField: "patientId",
+              foreignField: "_id",
+              as: "userDoc"
+          }
+      },
+      {
+          $unwind: { path: "$userDoc", preserveNullAndEmptyArrays: true }
+      },
+      {
+          $project: {
+              _id: 1,
+              startTime: 1,
+              consultationType: 1,
+              status: 1,
+              consultNotes: 1,
+
+              patientDetails: {
+                  name: "$userDoc.name",
+                  profileUrl: "$userDoc.profileUrl",
+                  age: "$userDoc.age",
+                  gender: "$userDoc.gender",
+              }
+          }
+      }
+    ]);
+
+    if (!pastConsultations || pastConsultations.length === 0) {
+      throw new ApiError(404, "No past consultations found");
+    }
+    return pastConsultations;
+  }
 }

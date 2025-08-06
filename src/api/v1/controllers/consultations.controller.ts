@@ -84,3 +84,38 @@ export const getPastConsultations = asyncHandler(async(req: AuthenticatedRequest
     .status(200)
     .json(new ApiResponse(200, result, "Past consultations retrieved successfully"));
 });
+
+
+export const getUpcomingConsultationsForDoctor = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const doctorId = req.user?.userId;
+
+    if (!doctorId) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "Doctor ID is required"));
+    }
+
+    const result = await ConsultationService.getUpcomingConsultationsForDoctor(doctorId);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, result, "Upcoming consultations for doctor retrieved successfully"));
+  }
+);
+
+export const getPastConsultationsForDoctor = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const doctorId = req.user?.userId;
+
+    if (!doctorId) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "Doctor ID is required"));
+    }
+
+    const result = await ConsultationService.getPastConsultationsForDoctor(doctorId);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, result, "Past consultations for doctor retrieved successfully"));
+  }
+);
