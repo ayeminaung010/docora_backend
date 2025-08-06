@@ -25,7 +25,7 @@ export interface PasswordChangeRequest {
 export class AuthService {
   private static readonly JWT_SECRET = (process.env.JWT_SECRET ||
     "irene_secret") as string;
-  private static readonly JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1h";
+  private static readonly JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN || "1h") as string;
   private static readonly REFRESH_THRESHOLD = 24 * 60 * 60;
 
   static generateToken(userId: string): string {

@@ -1,22 +1,28 @@
-import { ISchedule } from './../src/models/Schedule.model';
-import  mongoose, { Types, InferSchemaType } from "mongoose";
-import { Schedule } from "../src/models/Schedule.model"; // Make sure to export scheduleSchema
+import mongoose, { Types } from "mongoose";
+import { ISchedule, ITimeSlot, Schedule } from "../src/models/Schedule.model";
 
-// The array of time strings
-const timeSlotArray = [
-  "09:00 AM", "09:15 AM", "09:30 AM", "09:45 AM",
-  "10:00 AM", "10:15 AM", "10:30 AM", "10:45 AM",
-  "11:00 AM", "11:15 AM", "11:30 AM", "11:45 AM",
-  "01:00 PM", "01:15 PM", "01:30 PM", "01:45 PM",
-  "02:00 PM", "02:15 PM", "02:30 PM", "02:45 PM",
-  "03:00 PM", "03:15 PM", "03:30 PM", "03:45 PM",
-  "05:00 PM", "05:15 PM", "05:30 PM", "05:45 PM",
-  "06:00 PM", "06:15 PM", "06:30 PM", "06:45 PM",
-  "07:00 PM", "07:15 PM", "07:30 PM", "07:45 PM",
+const timeSlotStrings = [
+  "09:00", "09:15", "09:30", "09:45",
+  "10:00", "10:15", "10:30", "10:45",
+  "11:00", "11:15", "11:30", "11:45",
+  "13:00", "13:15", "13:30", "13:45",
+  "14:00", "14:15", "14:30", "14:45",
+  "15:00", "15:15", "15:30", "15:45",
+  "17:00", "17:15", "17:30", "17:45",
+  "18:00", "18:15", "18:30", "18:45",
+  "19:00", "19:15", "19:30", "19:45",
 ];
 
-// ✅ Automatically infer the document type from the Mongoose schema
-type ScheduleType = InferSchemaType<ISchedule>;
+interface ScheduleCreationData {
+  doctorId: Types.ObjectId;
+  date: Date;
+  fullTimeSlots: { // <-- This is just a plain object array
+    startTime: Date;
+    endTime: Date;
+    isBooked: boolean;
+    disabled: boolean;
+  }[];
+}
 
 export const runScheduleSeed = async () => {
   try {
@@ -27,37 +33,53 @@ export const runScheduleSeed = async () => {
 
     const mockDoctorIds = [new Types.ObjectId(), new Types.ObjectId()];
 
-    const fullTimeSlots = timeSlotArray.map((time) => ({
-      time,
-      isBooked: false,
-      disabled: false,
-    }));
-
-    // ✅ Explicitly type the array to prevent the 'never[]' inference
-    const schedulesToCreate: ScheduleType[] = [];
+    // ✅ FIX 2: Use the new, correct interface for the array.
+    const schedulesToCreate: ScheduleCreationData[] = [];
     const numberOfDaysToSeed = 5;
 
     for (const doctorId of mockDoctorIds) {
       for (let i = 0; i < numberOfDaysToSeed; i++) {
-        const scheduleDate = new Date();
-        scheduleDate.setUTCHours(0, 0, 0, 0);
-        scheduleDate.setDate(scheduleDate.getDate() + i);
+        const baseDate = new Date();
+        baseDate.setUTCDate(baseDate.getUTCDate() + i);
+        baseDate.setUTCHours(0, 0, 0, 0);
 
+        // ✅ FIX 3: Generate startTime and endTime to match your schema.
+        const fullTimeSlots  = timeSlotStrings.map((timeStr) => {
+          const [hours, minutes] = timeStr.split(':').map(Number);
+
+          // Create the start time for the slot
+          const startTime = new Date(baseDate);
+          startTime.setUTCHours(hours, minutes);
+
+          // Create the end time (15 minutes after start)
+          const endTime = new Date(startTime);
+          endTime.setUTCMinutes(endTime.getUTCMinutes() + 15);
+
+          return {
+            startTime, // Use the new startTime
+            endTime,   // Use the new endTime
+            isBooked: false,
+            disabled: false,
+          };
+        });
+
+        // This object now correctly matches the ScheduleCreationData type
         schedulesToCreate.push({
           doctorId,
-          date: scheduleDate,
+          date: baseDate,
           fullTimeSlots,
         });
       }
     }
 
+    // Mongoose's insertMany is designed to accept plain JavaScript objects like this.
     const result = await Schedule.insertMany(schedulesToCreate);
     
     console.log(`✅ Success! ${result.length} schedule documents were created.`);
 
   } catch (err) {
     console.error("❌ Schedule seeding failed:", err);
-  }finally {
+  } finally {
     await mongoose.connection.close();
     console.log("MongoDB connection closed.");
   }

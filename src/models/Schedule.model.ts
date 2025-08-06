@@ -19,7 +19,7 @@ export interface ITimeSlot extends Types.Subdocument {
 
 export interface ISchedule extends Document {
   _id: Types.ObjectId;
-  doctorId: Schema.Types.ObjectId;
+  doctorId: Types.ObjectId;
   date: Date;
   fullTimeSlots: ITimeSlot[];
 }

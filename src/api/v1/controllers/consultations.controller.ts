@@ -71,3 +71,32 @@ export const viewConsultation = asyncHandler(async (req: AuthenticatedRequest, r
       .json(new ApiResponse(200, result, "Consultation data get"));
 
 });
+export const getUpcomingConsultations = asyncHandler(async(req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user?.userId;
+
+  if (!userId) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, {}, "User ID is required"));
+  }
+
+  const result = await ConsultationService.getUpcomingConsultations(userId);
+  return res
+    .status(200)
+    .json(new ApiResponse(200, result, "Upcoming consultations retrieved successfully"));
+})
+
+export const getPastConsultations = asyncHandler(async(req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user?.userId;
+
+  if (!userId) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, {}, "User ID is required"));
+  }
+
+  const result = await ConsultationService.getPastConsultations(userId);
+  return res
+    .status(200)
+    .json(new ApiResponse(200, result, "Past consultations retrieved successfully"));
+});

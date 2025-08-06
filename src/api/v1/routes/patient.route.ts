@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createConsultation } from "../controllers/consultations.controller";
+import { createConsultation, getPastConsultations, getUpcomingConsultations } from "../controllers/consultations.controller";
 import {
   filterBySpecialty,
   getPopularDoctors,
@@ -27,8 +27,8 @@ router.post("/doctorReview",giveDoctorReview);
 // for home page
 
 // for appointment page
-// router.get("/consultations/upcoming", getUpcomingConsultations)
-// router.get("/consultations/past", getPastConsultations)
+router.get("/consultations/upcoming", getUpcomingConsultations)
+router.get("/consultations/past", getPastConsultations)
 // router.get("/consultations/filter", getFilteredConsultations)
 
 //for chat page
@@ -47,9 +47,9 @@ export default router;
 
 
 // patient booking appointment -> create consultation //done
-// patient create healthconcerns -> create healthconcerns //done
+// patient create healthconcerns -> create healthconcerns //done - same with booking appointment
 // patient view consultation -> view consultation
 // patient end consultation -> end consultation
 // patient cancel consultation -> cancel consultation
-// patient view consultation notes -> view consultation notes 
+// patient view consultation notes -> view consultation notes //done 
 // patient review doctor -> review doctor // done
