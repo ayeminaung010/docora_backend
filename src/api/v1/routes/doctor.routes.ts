@@ -2,6 +2,8 @@ import { Router } from "express";
 import {
     addNoteToConsultation,
     endConsultation,
+    getPastConsultationsForDoctor,
+    getUpcomingConsultationsForDoctor,
     viewConsultation,
 } from "../controllers/consultations.controller";
 import {
@@ -22,11 +24,11 @@ router.post("/verifyIdentity", verifyIdentityDoctor);
 
 //for home page
 // router.get("/home", getHomeData) // home page
-// router.get("/notificatons", getNotifications) // go to noti page
+// router.get("/notifications", getNotifications) // go to noti page
 
 //for appointment page
-// router.get("/consultations/upcoming", getUpcomingConsultations)
-// router.get("/consultations/past", getPastConsultations)
+router.get("/consultations/upcoming", getUpcomingConsultationsForDoctor)
+router.get("/consultations/past", getPastConsultationsForDoctor)
 // router.get("/consultations/filter", getFilteredConsultations)
 
 //for consultation page
