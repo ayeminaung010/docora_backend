@@ -1,6 +1,6 @@
 import { Doctor } from "../models/Doctor.model";
 import { Patient } from "../models/Patient.model";
-import {  User } from "../models/User.model";
+import { User } from "../models/User.model";
 import { ApiError } from "../utils/ApiError";
 
 export interface VerifyIdentitiyRequest {
@@ -26,7 +26,6 @@ export interface UpdateProfileRequest {
   workPlace?: string;
   graduateSchool?: string;
 }
-
 
 export interface patientDataReponse {
   name: string;
@@ -146,11 +145,12 @@ export class DoctorService {
     }
   }
 
-  
-
-  static async getPatientDetails(userId: string, patientId: string): Promise<any> {
+  static async getPatientDetails(
+    userId: string,
+    patientId: string
+  ): Promise<any> {
     const [userDetails, patientDetails] = await Promise.all([
-      User.findById(userId).select("-password").lean(), 
+      User.findById(userId).select("-password").lean(),
       Patient.findOne({ userId: patientId }).lean(),
     ]);
 
@@ -178,4 +178,32 @@ export class DoctorService {
     return patientData;
   }
 
+  static async getProfileData(userId: string): Promise<any> {
+    const [userDetail, doctorDetail] = await Promise.all([
+      User.findById(userId).select("-password").lean(),
+      Doctor.findOne({ userId: userId }).lean(),
+    ]);
+
+    if (!userDetail) {
+      throw new ApiError(404, "User not found");
+    }
+    if (!doctorDetail) {
+      throw new ApiError(404, "User details not found");
+    }
+
+    const profileData ={
+      name: userDetail.name,
+      email: userDetail.email,
+      profileUrl: userDetail.profileUrl,
+      verifyEmail: userDetail.verifyEmail,
+      address: userDetail.address,
+      phoneNumber: userDetail.phoneNumber,
+      specialty: doctorDetail.speciality,
+      workPlace: doctorDetail.workPlace,
+      graduateSchool: doctorDetail.graduateSchool,
+      yearOfExp: doctorDetail.yearsOfExperience,
+        };
+
+    return profileData;
+  }
 }

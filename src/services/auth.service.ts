@@ -75,10 +75,12 @@ export class AuthService {
     console.log("Token", token);
 
     const userId = user._id.toString();
+    const role= user.role;
 
     return {
       userId,
       token,
+      role,
     };
   }
 

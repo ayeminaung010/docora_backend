@@ -10,6 +10,7 @@ import {
     viewConsultation,
 } from "../controllers/consultations.controller";
 import {
+    getProfileData,
     profileUpdate,
     verifyIdentityDoctor,
     viewUserDetails,
@@ -57,7 +58,9 @@ router.post("/schedule/create", createSchedule) // not done
 // router.use(authorize(["DOCTOR"]));
 
 //for profile
+router.get("/profile",getProfileData);
 router.patch("/profile/update", profileUpdate);
+
 router.get("/popularDoctors", getPopularDoctors);
 router.get("/user/details/:id", viewUserDetails);
 router.get("/consultationData/:id",viewConsultation);

@@ -64,3 +64,20 @@ export const viewUserDetails = asyncHandler(
       .json(new ApiResponse(200, userDetails, "User details retrieved successfully"));
   }
 );
+
+export const getProfileData = asyncHandler(async(req: AuthenticatedRequest, res: Response)=>{
+  const userId = req.user?.userId;
+
+  if(!userId){
+    return res.status(400).json(new ApiResponse(400,{},"User ID is required"));
+  }
+  const profileDetail = await DoctorService.getProfileData(userId);
+  if(!profileDetail){
+      return res
+        .status(404)
+        .json(new ApiResponse(404, {}, "User not found"));
+  }
+     return res
+      .status(200)
+      .json(new ApiResponse(200, profileDetail, "User details retrieved successfully"));
+});
