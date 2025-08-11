@@ -8,9 +8,16 @@ import { AuthenticatedRequest } from "./../middlewares/auth.middleware";
 export const signUp = asyncHandler(async (req: Request, res: Response) => {
   const result = await AuthService.signUp(req.body);
 
+  try {
+    await AuthService.sendSignUpOTP(result.email, result.name);
+    // console.log(`✅ Sign-up OTP sent to ${result.email} after registration`);
+  } catch (otpError) {
+    console.error('⚠️ Failed to send sign-up OTP:', otpError);
+  }
+
   return res
-    .status(200)
-    .json(new ApiResponse(200, "User signed up successfully"));
+    .status(201)
+    .json(new ApiResponse(201, result, "User signed up successfully"));
 });
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
@@ -23,7 +30,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 
 export const verifyToken = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    res.status(200).json(new ApiResponse(200, req.user, "Token is Vaild"));
+    res.status(200).json(new ApiResponse(200, req.user, "Token is valid"));
   }
 );
 
@@ -57,7 +64,6 @@ export const refreshToken = asyncHandler(
   }
 );
 
-// New endpoint for checking token status
 export const checkTokenStatus = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const authHeader = req.headers.authorization;
@@ -89,6 +95,22 @@ export const checkTokenStatus = asyncHandler(
         .status(401)
         .json(new ApiResponse(401, { valid: false }, error.message));
     }
+  }
+);
+
+export const sendSignUpOTP = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { email, name } = req.body;
+
+    if (!email || !name) {
+      throw new ApiError(400, "Email and name are required");
+    }
+
+    const result = await AuthService.sendSignUpOTP(email, name);
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, result.message));
   }
 );
 
@@ -124,47 +146,71 @@ export const forgotPassword = asyncHandler(
       throw new ApiError(400, "Email is required");
     }
 
-    await AuthService.forgotPassword(email);
+    const result = await AuthService.forgotPassword(email);
 
     return res
       .status(200)
-      .json(
-        new ApiResponse(200, null, "Password reset link sent to your email")
-      );
+      .json(new ApiResponse(200, null, result.message));
   }
 );
 
 export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
-  const { otp } = req.body;
+  const { email, otp } = req.body;
+  
+  if (!email) {
+    throw new ApiError(400, "Email is required");
+  }
+  
   if (!otp) {
     throw new ApiError(400, "OTP is required");
   }
-  // Simulate OTP verification
-  console.log(`OTP ${otp} verified successfully`);
+
+  const result = await AuthService.verifyOTP(email, otp);
+  
   return res
     .status(200)
-    .json(new ApiResponse(200, null, "OTP verified successfully"));
+    .json(new ApiResponse(200, null, result.message));
 });
 
 export const resetPassword = asyncHandler(
   async (req: Request, res: Response) => {
-    const { newPassword, email } = req.body;
+    const { email, otp, newPassword } = req.body;
+    
+    if (!email) {
+      throw new ApiError(400, "Email is required");
+    }
+    
+    if (!otp) {
+      throw new ApiError(400, "OTP is required");
+    }
+    
     if (!newPassword) {
       throw new ApiError(400, "New password is required");
     }
-    if (!email) {
-      throw new ApiError(500, "Email is required");
-    }
-    const userId = await AuthService.getUserById(email);
-    if (!userId) {
-      throw new ApiError(404, "User not found");
-    }
-    const result = await AuthService.changePassword(userId, {
-      password: newPassword,
+
+    const result = await AuthService.resetPassword({
+      email,
+      otp,
+      newPassword
     });
 
     return res
       .status(200)
-      .json(new ApiResponse(200, result, "Password reset successfully"));
+      .json(new ApiResponse(200, null, result.message));
+  }
+);
+
+// Optional: Add endpoint to get OTP statistics (for debugging/monitoring)
+export const getOTPStats = asyncHandler(
+  async (req: Request, res: Response) => {
+    // Only allow in development or for admin users
+    if (process.env.NODE_ENV === 'production') {
+      throw new ApiError(403, "Not available in production");
+    }
+    
+    const stats = AuthService.getOTPStats();
+    return res
+      .status(200)
+      .json(new ApiResponse(200, stats, "OTP statistics retrieved"));
   }
 );
