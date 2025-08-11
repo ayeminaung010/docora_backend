@@ -7,7 +7,8 @@ import { ApiResponse } from "../../../utils/ApiResponse";
 
 export const viewScheduleDoctor = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const doctorId = req.user?.id;
+    // const doctorId = req.user?.id;
+    const { doctorId } = req.params;
     console.log("Doctor ID:", doctorId);
 
     if (!doctorId) {

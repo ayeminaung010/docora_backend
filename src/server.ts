@@ -26,6 +26,11 @@ const startServer = () => {
   });
 };
 
+app.use((req, res, next) => {
+    console.log("👀 Incoming:", req.method, req.url);
+    next();
+});
+
 // --- Connect to Database and Start Server ---
 // We'll wrap the server start in a database connection function
 // For now, we can just start it directly.
