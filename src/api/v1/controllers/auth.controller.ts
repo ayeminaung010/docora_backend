@@ -212,5 +212,20 @@ export const getOTPStats = asyncHandler(
     return res
       .status(200)
       .json(new ApiResponse(200, stats, "OTP statistics retrieved"));
+    }
+);
+
+export const getMeAuth = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res
+        .status(401)
+        .json(new ApiResponse(401, null, "Unauthorized - User ID not found"));
+    }
+
+    const user = await AuthService.getUserById(userId);
+    return res.status(200).json(new ApiResponse(200, user, "User retrieved successfully"));
   }
 );

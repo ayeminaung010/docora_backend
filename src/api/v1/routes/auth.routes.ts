@@ -1,6 +1,6 @@
 import { Router } from "express";
 import express from 'express'; // <-- Add this import
-import { signUp, login, verifyToken, checkTokenStatus, changePassword, logout, forgotPassword, resetPassword, verifyOTP,sendSignUpOTP } from "../controllers/auth.controller";
+import { signUp, login, verifyToken, checkTokenStatus, changePassword, logout, forgotPassword, resetPassword, verifyOTP,sendSignUpOTP , getMeAuth } from "../controllers/auth.controller";
 import {
   authenticate,
   authenticateTokenWithAutoRefresh,
@@ -20,6 +20,7 @@ router.post("/sendSignUpOTP", sendSignUpOTP);
 
 router.post("/refreshToken", authenticateTokenWithAutoRefresh, checkTokenStatus);
 router.use(authenticate);
+router.get('/me', getMeAuth);
 router.post("/verifyToken", verifyToken);
 router.patch("/changePassword", changePassword);
 router.post("/logout", logout)

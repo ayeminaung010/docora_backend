@@ -39,8 +39,8 @@ const userSchema = new Schema<IUser>(
     },
     role: {
       type: String,
-      enum: ["PATIENT", "DOCTOR"],
-      default: "PATIENT",
+      enum: ["UNDEFINED", "PATIENT", "DOCTOR"],
+      default: "UNDEFINED",
     },
     verifyEmail:{
       type: Boolean,
