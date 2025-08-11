@@ -5,6 +5,24 @@ import { asyncHandler } from "../../../utils/asyncHandler";
 import { PatientService } from "../../../services/patient.service";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 
+export const getProfilePatient = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?.userId;
+    console.log("User ID:", userId);
+
+    if (!userId) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, {}, "User ID is required"));
+    }
+
+    const patientProfile = await PatientService.getProfilePatient(userId);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, patientProfile, "Patient profile loaded successfully"));
+  }
+);
+
 export const patientDetailForm = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.userId;

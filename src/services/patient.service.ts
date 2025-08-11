@@ -34,6 +34,34 @@ import { Review } from "../models/Review.model";
   }
 
   export class PatientService {
+    static async getProfilePatient(userId: string): Promise<any> {
+      const [user, patient] = await Promise.all([
+        User.findById(userId),
+        Patient.findOne({ userId }),
+      ]);
+      if (!patient && !user) {
+        throw new ApiError(404, "Patient data not found");
+      }
+      console.log("User found:", user);
+      console.log("Patient found:", patient);
+      const userData  = {
+        name: user?.name,
+        profileUrl: user?.profileUrl,
+        email: user?.email,
+        phoneNumber: user?.phoneNumber,
+        address: user?.address,
+        dateOfBirth: user?.dateOfBirth,
+        gender: user?.gender,
+        age: user?.age,
+        verifyEmail: user?.verifyEmail,
+        bloodType: patient?.bloodType,
+        allergies: patient?.allergies,
+        chronicConditions: patient?.chronicConditions,
+        currentMedications: patient?.currentMedications,
+      }
+      return userData;
+    }
+
     static async patientDetailForm(
       userId: string,
       req: detailFormRequest

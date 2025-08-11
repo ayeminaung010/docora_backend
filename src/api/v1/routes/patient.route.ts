@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  cancelConsultation,
   createConsultation,
   getPastConsultations,
   getUpcomingConsultations,
@@ -8,6 +9,7 @@ import {
 import {
   filterBySpecialty,
   getPopularDoctors,
+  getProfilePatient,
   giveDoctorReview,
   patientDetailForm,
   patientProfileUpdate,
@@ -20,7 +22,7 @@ import { authenticate } from "../middlewares/auth.middleware";
 const router = Router();
 // router.use(authorize(["PATIENT"]));
 router.use(authenticate);
-
+router.get("/profile", getProfilePatient);
 router.post("/patientDetailForm", patientDetailForm);
 router.patch("/patientInfoUpdate", patientProfileUpdate);
 router.get("/popularDoctors", getPopularDoctors);
@@ -36,7 +38,7 @@ router.get("/consultations/upcoming", getUpcomingConsultations);
 router.get("/consultations/past", getPastConsultations);
 // router.get("/consultations/filter", getFilteredConsultations)
 router.get("/consultation/note/:id", viewConsultationNote);
-// router.post("/consultation/cancel/:id", cancelConsultation);
+router.post("/consultation/cancel/:id", cancelConsultation);
 
 //for chat page
 // router.get("/chats", getChats)
