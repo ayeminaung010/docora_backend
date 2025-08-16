@@ -23,7 +23,8 @@ export interface JWTPayload {
 }
 
 export interface PasswordChangeRequest {
-  password: string;
+  oldPassword: string;
+  newPassword: string;
 }
 
 export interface PasswordResetRequest {
@@ -201,20 +202,25 @@ export class AuthService {
     userId: string,
     req: PasswordChangeRequest
   ): Promise<Partial<IUser>> {
-    if (!req.password) {
+    if (!req.oldPassword) {
       throw new ApiError(400, "Password is required");
     }
 
-    if (req.password.length < 6) {
+    if (req.oldPassword.length < 6) {
       throw new ApiError(400, "Password must be at least 6 characters long");
     }
 
-    const user: IUser | null = await User.findById(userId);
+     const user = await User.findById(userId);
     if (!user) {
-      throw new ApiError(404, "User not found");
+      throw new ApiError(401, "Invalid email or password");
     }
 
-    user.password = req.password;
+    const isPasswordCorrect = await user.isCorrectPassword(req.oldPassword);
+    if (!isPasswordCorrect) {
+      throw new ApiError(401, "Invalid email or password");
+    }
+
+    user.password = req.newPassword;
     await user.save();
     
     // Return user without password
