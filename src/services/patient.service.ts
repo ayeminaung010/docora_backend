@@ -89,29 +89,27 @@ import { Review } from "../models/Review.model";
       userId: string,
       profileData: updatePatientRequest
     ): Promise<any> {
-      const [user, patient] = await Promise.all([
+      const [user, existingPatient] = await Promise.all([
         User.findById(userId),
-        Patient.findOne({ userId }),
+        Patient.findOne({ userId : userId }),
       ]);
 
       if (!user) {
         throw new ApiError(404, "User not found");
       }
-
-      if (!patient) {
-        throw new ApiError(
-          404,
-          "Patient data not found. Please submit initial patient details first."
-        );
+      if (!existingPatient) {
+        throw new ApiError(404, "Patient not found");
       }
 
+      console.log("req data found:", profileData?.gender , "existing:", existingPatient); 
       if (
         profileData?.name ||
         profileData?.profile_url ||
         profileData?.email ||
         profileData?.phone ||
         profileData?.address ||
-        profileData?.date_of_birth
+        profileData?.date_of_birth ||
+        profileData?.gender 
       ) {
         if (profileData.name) user.name = profileData.name;
         if (profileData.email) {
@@ -128,13 +126,17 @@ import { Review } from "../models/Review.model";
         if (profileData.date_of_birth)
           user.dateOfBirth = profileData.date_of_birth;
         if (profileData.gender) user.gender = profileData.gender;
-        if (profileData.age) user.age = profileData.age;
         if (profileData.profile_url) user.profileUrl = profileData.profile_url;
-
-        await user.save();
-        return user;
+        // change dob to age
+        if (profileData.date_of_birth) {
+          const age = new Date().getFullYear() - new Date(profileData?.date_of_birth).getFullYear();
+          console.log("Calculated age:", age);
+          user.age = age;
+        }
       }
+      user.role = "PATIENT";
 
+      const patient = existingPatient || new Patient({ userId: userId });
       if (
         profileData.bloodType ||
         profileData.allergies ||
@@ -147,10 +149,13 @@ import { Review } from "../models/Review.model";
           patient.chronicConditions = profileData.chronicConditions;
         if (profileData.currentMedications)
           patient.currentMedications = profileData.currentMedications;
-
-        await patient.save();
-        return patient;
       }
+
+      const [updatedUser, updatedPatient] = await Promise.all([
+        user.save(),
+        patient.save(),
+      ]);
+      return { user: updatedUser, patient: updatedPatient };
     }
 
     static async popularDoctors(limit: number = 5): Promise<any> {

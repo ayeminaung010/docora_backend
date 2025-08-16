@@ -32,7 +32,7 @@ async function runAllMigrations() {
     
     // Step 4: Create consultations (requires users and schedules to exist)
     // console.log("--- Running Consultation Migration ---");
-    await runConsultationMigration();
+    // await runConsultationMigration();
 
     console.log("All migrations completed successfully!");
 

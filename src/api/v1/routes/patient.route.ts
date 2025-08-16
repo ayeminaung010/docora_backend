@@ -24,7 +24,7 @@ const router = Router();
 router.use(authenticate);
 router.get("/profile", getProfilePatient);
 router.post("/patientDetailForm", patientDetailForm);
-router.patch("/patientInfoUpdate", patientProfileUpdate);
+router.patch("/info/update", patientProfileUpdate);
 router.get("/popularDoctors", getPopularDoctors);
 router.get("/search/doctors/name", searchDoctorsByName);
 router.get("/search/:specialty/name", searchDoctorsByNameAndSpecialty);
