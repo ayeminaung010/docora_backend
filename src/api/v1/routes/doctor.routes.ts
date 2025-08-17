@@ -43,7 +43,7 @@ router.post("/consultation/note/create/:id", addNoteToConsultation);
 router.get("/consultation/note/:id", viewConsultationNote);
 
 
-// for scheduling page 
+// for scheduling page
 router.get("/schedule/:doctorId", viewScheduleDoctor);
 router.post("/schedule/create", createSchedule) // not done 
 // router.post("/schedule/delete", deleteSchedule)
