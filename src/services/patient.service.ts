@@ -20,7 +20,7 @@ export interface updatePatientRequest {
   email?: string;
   phone?: string;
   address?: string;
-  date_of_birth?: Date;
+  dateOfBirth?: Date;
   gender?: string;
   age?: number;
   bloodType?: string;
@@ -65,7 +65,7 @@ export class PatientService {
     return userData;
   }
 
-   static async patientDetailForm(
+  static async patientDetailForm(
     userId: string,
     req: detailFormRequest
   ): Promise<any> {
@@ -128,24 +128,39 @@ export class PatientService {
       profileData?.email ||
       profileData?.phone ||
       profileData?.address ||
-      profileData?.date_of_birth
+      profileData?.dateOfBirth ||
+      profileData?.gender ||
+      profileData?.age
     ) {
       if (profileData.name) user.name = profileData.name;
       if (profileData.email) {
         // Check if email is already in use by another user
         const existingUser = await User.findOne({ email: profileData.email });
         if (existingUser && existingUser._id.toString() !== userId) {
-          throw new ApiError(400, "Email is already in use ");
+          throw new ApiError(400, "Email is already in use");
         }
         user.email = profileData.email;
         user.verifyEmail = false;
       }
       if (profileData.phone) user.phoneNumber = profileData.phone;
       if (profileData.address) user.address = profileData.address;
-      if (profileData.date_of_birth)
-        user.dateOfBirth = profileData.date_of_birth;
+      if (profileData.dateOfBirth) {
+        user.dateOfBirth = profileData.dateOfBirth;
+
+        // Recalculate age from dateOfBirth
+        const today = new Date();
+        const birthDate = new Date(profileData.dateOfBirth);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < birthDate.getDate())
+        ) {
+          age--;
+        }
+        user.age = age;
+      }
       if (profileData.gender) user.gender = profileData.gender;
-      if (profileData.age) user.age = profileData.age;
       if (profileData.profile_url) user.profileUrl = profileData.profile_url;
 
       await user.save();
@@ -169,33 +184,32 @@ export class PatientService {
       return patient;
     }
   }
-
   static async popularDoctors(limit: number = 5): Promise<any> {
-  // Fetch doctors that are verified and have a linked user
-  const doctors = await Doctor.find({
-    isVerified: true,
-    userId: { $ne: null },
-  })
-    .populate({
-      path: "userId",
-      select: "name profileUrl",
-      options: { lean: true },
+    // Fetch doctors that are verified and have a linked user
+    const doctors = await Doctor.find({
+      isVerified: true,
+      userId: { $ne: null },
     })
-    .sort({ averageRating: -1, yearsOfExperience: -1 })
-    .limit(limit)
-    .select("speciality averageRating yearsOfExperience userId")
-    .lean();
+      .populate({
+        path: "userId",
+        select: "name profileUrl",
+        options: { lean: true },
+      })
+      .sort({ averageRating: -1, yearsOfExperience: -1 })
+      .limit(limit)
+      .select("speciality averageRating yearsOfExperience userId")
+      .lean();
 
-  // Merge user fields into a flat shape that the client can use easily
-  return doctors.map((doctor: any) => ({
-    _id: doctor._id,
-    speciality: doctor.speciality,
-    averageRating: doctor.averageRating,
-    yearsOfExperience: doctor.yearsOfExperience ?? null,
-    name: doctor.userId?.name ?? null,
-    profileUrl: doctor.userId?.profileUrl ?? null,
-  }));
-}
+    // Merge user fields into a flat shape that the client can use easily
+    return doctors.map((doctor: any) => ({
+      _id: doctor._id,
+      speciality: doctor.speciality,
+      averageRating: doctor.averageRating,
+      yearsOfExperience: doctor.yearsOfExperience ?? null,
+      name: doctor.userId?.name ?? null,
+      profileUrl: doctor.userId?.profileUrl ?? null,
+    }));
+  }
 
   static async filterDoctorBySpecialty(givenSpecialty: String): Promise<any> {
     const resultDoctors = await Doctor.find({
