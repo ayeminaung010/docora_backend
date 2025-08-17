@@ -4,6 +4,7 @@ import { ApiError } from "../utils/ApiError";
 import { User } from "../models/User.model";
 import { Doctor } from "../models/Doctor.model";
 import { Review } from "../models/Review.model";
+import { userRole } from "../enum/userRole";
 
 export interface detailFormRequest {
   bloodType: string;
