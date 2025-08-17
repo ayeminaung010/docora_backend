@@ -20,7 +20,7 @@ async function runAllMigrations() {
     
     // Step 1: Create users (patients and doctors)
     // console.log("--- Running User Migration ---");
-    // await runUserMigration();
+    await runUserMigration();
     
     // Step 2: Create doctors (if separate from users)
     // console.log("--- Running Doctor Migration ---");

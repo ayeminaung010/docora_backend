@@ -4,7 +4,6 @@ import { ApiError } from "../utils/ApiError";
 import { User } from "../models/User.model";
 import { Doctor } from "../models/Doctor.model";
 import { Review } from "../models/Review.model";
-import { userRole } from "../enum/userRole";
 
 export interface detailFormRequest {
   bloodType: string;
@@ -45,8 +44,8 @@ export class PatientService {
     if (!patient && !user) {
       throw new ApiError(404, "Patient data not found");
     }
-    console.log("User found:", user);
-    console.log("Patient found:", patient);
+    // console.log("User found:", user);
+    // console.log("Patient found:", patient);
     const userData = {
       name: user?.name,
       profileUrl: user?.profileUrl,
@@ -65,7 +64,7 @@ export class PatientService {
     return userData;
   }
 
-  static async patientDetailForm(
+   static async patientDetailForm(
     userId: string,
     req: detailFormRequest
   ): Promise<any> {
@@ -171,15 +170,31 @@ export class PatientService {
   }
 
   static async popularDoctors(limit: number = 5): Promise<any> {
-    const popularDoctors = await Doctor.find({ isVerified: true })
-      .populate("userId", "name profileUrl")
-      .sort({ averageRating: -1, yearsOfExperience: -1 })
-      .limit(limit)
-      .select("speciality averageRating")
-      .lean();
+  // Fetch doctors that are verified and have a linked user
+  const doctors = await Doctor.find({
+    isVerified: true,
+    userId: { $ne: null },
+  })
+    .populate({
+      path: "userId",
+      select: "name profileUrl",
+      options: { lean: true },
+    })
+    .sort({ averageRating: -1, yearsOfExperience: -1 })
+    .limit(limit)
+    .select("speciality averageRating yearsOfExperience userId")
+    .lean();
 
-    return popularDoctors;
-  }
+  // Merge user fields into a flat shape that the client can use easily
+  return doctors.map((doctor: any) => ({
+    _id: doctor._id,
+    speciality: doctor.speciality,
+    averageRating: doctor.averageRating,
+    yearsOfExperience: doctor.yearsOfExperience ?? null,
+    name: doctor.userId?.name ?? null,
+    profileUrl: doctor.userId?.profileUrl ?? null,
+  }));
+}
 
   static async filterDoctorBySpecialty(givenSpecialty: String): Promise<any> {
     const resultDoctors = await Doctor.find({
