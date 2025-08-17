@@ -9,7 +9,9 @@ export interface detailFormRequest {
   bloodType: string;
   allergies?: string[];
   chronicConditions?: string[];
-  currentMedications?: string[];
+  // currentMedications?: string[];
+  gender?: string;
+  dateOfBirth?: Date;
 }
 export interface updatePatientRequest {
   name?: string;
@@ -62,27 +64,41 @@ export class PatientService {
     return userData;
   }
 
-  static async patientDetailForm(
+   static async patientDetailForm(
     userId: string,
     req: detailFormRequest
   ): Promise<any> {
     const existPatient = await Patient.findOne({ userId });
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
 
     if (existPatient) {
       throw new ApiError(403, "Patient data already submitted");
     }
+
+    user.dateOfBirth = req.dateOfBirth;
+    if (req.dateOfBirth) {
+      const age =
+        new Date().getFullYear() - new Date(req.dateOfBirth).getFullYear();
+      user.age = age;
+    }
+    user.role = userRole.PATIENT;
+    user.gender = req.gender;
 
     const newPatient = new Patient({
       userId: userId,
       bloodType: req.bloodType,
       allergies: req.allergies,
       chronicConditions: req.chronicConditions,
-      currentMedications: req.currentMedications,
     });
 
+    const updateUser = await user.save();
     const savedPatient = await newPatient.save();
 
-    return savedPatient;
+    return { patient: savedPatient, user: updateUser };
   }
 
   static async patientProfileUpdate(
