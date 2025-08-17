@@ -35,7 +35,7 @@ export const patientDetailForm = asyncHandler(
     const result = await PatientService.patientDetailForm(userId, req.body);
     return res
       .status(200)
-      .json(new ApiResponse(200, "Patient Data Saved Successfully"));
+      .json(new ApiResponse(200,result, "Patient Data Saved Successfully"));
   }
 );
 
