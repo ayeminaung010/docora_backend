@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
-import { User } from "../src/models/User.model";
-import { Doctor } from "../src/models/Doctor.model";
 import { faker } from "@faker-js/faker";
+import mongoose from "mongoose";
+import { Doctor } from "../src/models/Doctor.model";
+import { User } from "../src/models/User.model";
 
 const medicalSpecialties = [
   'General Physician',
@@ -59,10 +59,10 @@ const createRandomDoctor = (userId: string) => {
     userId: userId,
     medicalLicenseNo: `MD${faker.string.alphanumeric({ length: 8 }).toUpperCase()}`,
     issueCountry: faker.helpers.arrayElement(countries),
-    speciality: specialty,
+    specialty: specialty,
     yearsOfExperience: yearsExp.toString(),
     medicalCertificate: `CERT${faker.string.alphanumeric({ length: 10 }).toUpperCase()}`,
-    govermentId: faker.string.alphanumeric({ length: 12 }).toUpperCase(),
+    governmentId: faker.string.alphanumeric({ length: 12 }).toUpperCase(),
     isVerified: faker.datatype.boolean({ probability: 0.8 }), // 80% verified
     submitAt: faker.date.past({ years: 2 }),
     workPlace: faker.helpers.arrayElement(workplaces),
@@ -106,7 +106,7 @@ export const runDoctorMigration = async () => {
     // Log some sample data
     console.log("\nSample created doctors:");
     result.slice(0, 3).forEach((doctor, index) => {
-      console.log(`${index + 1}. License: ${doctor.medicalLicenseNo}, Specialty: ${doctor.speciality}, Experience: ${doctor.yearsOfExperience} years`);
+      console.log(`${index + 1}. License: ${doctor.medicalLicenseNo}, Specialty: ${doctor.specialty}, Experience: ${doctor.yearsOfExperience} years`);
     });
     
   } catch (err) {

@@ -3,13 +3,13 @@ import { Document, model, Schema, Types } from "mongoose";
 export interface IDoctor extends Document {
     _id: Types.ObjectId;
     userId: Types.ObjectId; 
-    speciality: string;
+    specialty: string;
     bio?: string;
     yearsOfExperience: string;
     medicalLicenseNo: string;
     issueCountry: string;
     medicalCertificate: string;
-    govermentId: string;
+    governmentId: string;
     averageRating?: number;
     workPlace?: string;
     graduateSchool?: string;
@@ -25,7 +25,7 @@ const doctorSchema = new Schema<IDoctor>({
         required: true,
         unique: true
     },
-    speciality: {
+    specialty: {
         type: String,
         required: true,
         trim: true,
@@ -50,7 +50,7 @@ const doctorSchema = new Schema<IDoctor>({
         type: String,
         required: true,
     },
-    govermentId: {
+    governmentId: {
         type: String,
         required: true,
     },

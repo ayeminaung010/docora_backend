@@ -66,7 +66,7 @@ const userSchema = new Schema<IUser>(
     },
     gender: {
       type: String,
-      enum: ["Male", "Female", "UNKNOWN"],
+      enum: ["Male", "Female", "RatherNotToSay"],
     },
     age: {
       type: Number,

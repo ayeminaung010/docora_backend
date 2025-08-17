@@ -1,8 +1,8 @@
 import mongoose, { Types } from "mongoose";
 import { Consultation } from "../models/Consultation.model";
 import { Schedule } from "../models/Schedule.model";
-import { ApiError } from "../utils/ApiError";
 import { User } from "../models/User.model";
+import { ApiError } from "../utils/ApiError";
 
 export interface CreateConsultationRequest {
   startTime: Date;
@@ -267,7 +267,7 @@ export class ConsultationService {
                   profileUrl: "$userDoc.profileUrl",
                   // workPlace: "$doctorDoc.workPlace",
                   // graduateSchool: "$doctorDoc.graduateSchool",
-                  speciality: "$doctorDoc.speciality",
+                  specialty: "$doctorDoc.specialty",
                   yearsOfExperience: "$doctorDoc.yearsOfExperience",
                   averageRating: "$doctorDoc.averageRating",
               }
@@ -332,7 +332,7 @@ export class ConsultationService {
               doctorDetails: {
                   name: "$userDoc.name",
                   profileUrl: "$userDoc.profileUrl",
-                  speciality: "$doctorDoc.speciality",
+                  specialty: "$doctorDoc.specialty",
                   yearsOfExperience: "$doctorDoc.yearsOfExperience",
                   averageRating: "$doctorDoc.averageRating",
               }

@@ -1,10 +1,10 @@
 import { Types } from "mongoose";
-import { Patient, IPatient } from "../models/Patient.model";
-import { ApiError } from "../utils/ApiError";
-import { User } from "../models/User.model";
-import { Doctor } from "../models/Doctor.model";
-import { Review } from "../models/Review.model";
 import { userRole } from "../enum/userRole";
+import { Doctor } from "../models/Doctor.model";
+import { Patient } from "../models/Patient.model";
+import { Review } from "../models/Review.model";
+import { User } from "../models/User.model";
+import { ApiError } from "../utils/ApiError";
 
 export interface detailFormRequest {
   bloodType: string;
@@ -197,13 +197,13 @@ export class PatientService {
       })
       .sort({ averageRating: -1, yearsOfExperience: -1 })
       .limit(limit)
-      .select("speciality averageRating yearsOfExperience userId")
+      .select("specialty averageRating yearsOfExperience userId")
       .lean();
 
     // Merge user fields into a flat shape that the client can use easily
     return doctors.map((doctor: any) => ({
       _id: doctor._id,
-      speciality: doctor.speciality,
+      specialty: doctor.specialty,
       averageRating: doctor.averageRating,
       yearsOfExperience: doctor.yearsOfExperience ?? null,
       name: doctor.userId?.name ?? null,
@@ -213,11 +213,11 @@ export class PatientService {
 
   static async filterDoctorBySpecialty(givenSpecialty: String): Promise<any> {
     const resultDoctors = await Doctor.find({
-      speciality: new RegExp(`^${givenSpecialty}$`, "i"),
+      specialty: new RegExp(`^${givenSpecialty}$`, "i"),
     })
       .populate("userId", "name profileUrl")
       .sort({ averageRating: -1 })
-      .select("speciality averageRating")
+      .select("specialty averageRating")
       .lean();
 
     return resultDoctors;
@@ -235,7 +235,7 @@ export class PatientService {
         select: "name profileUrl",
       })
       .sort({ averageRating: -1, yearsOfExperience: -1 })
-      .select("speciality averageRating")
+      .select("specialty averageRating")
       .lean();
 
     const filteredDoctors = doctors.filter((doctor) => doctor.userId !== null);
@@ -249,7 +249,7 @@ export class PatientService {
   ): Promise<any> {
     const doctors = await Doctor.find({
       isVerified: true,
-      speciality: new RegExp(`^${specialty}$`, "i"),
+      specialty: new RegExp(`^${specialty}$`, "i"),
     })
       .populate({
         path: "userId",
@@ -259,7 +259,7 @@ export class PatientService {
         select: "name profileUrl",
       })
       .sort({ averageRating: -1, yearsOfExperience: -1 })
-      .select("speciality averageRating")
+      .select("specialty averageRating")
       .lean();
 
     // Filter out doctors where userId is null (no name match)
@@ -289,7 +289,7 @@ export class PatientService {
       profileUrl: userDetails.profileUrl,
       workPlace: doctorDetails.workPlace,
       graduateSchool: doctorDetails.graduateSchool,
-      speciality: doctorDetails.speciality,
+      specialty: doctorDetails.specialty,
       yearsOfExperience: doctorDetails.yearsOfExperience,
       averageRating: doctorDetails.averageRating,
       consultationType: doctorDetails.consultationType,
