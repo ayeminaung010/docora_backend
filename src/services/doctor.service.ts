@@ -6,10 +6,10 @@ import { ApiError } from "../utils/ApiError";
 export interface VerifyIdentitiyRequest {
   medicalLicenseNo: string;
   issueCountry: string;
-  speciality: string;
+  specialty: string;
   yearsOfExperience: string;
   medicalCertificate: string;
-  govermentId: string;
+  governmentId: string;
 }
 
 export interface UpdateProfileRequest {
@@ -22,7 +22,7 @@ export interface UpdateProfileRequest {
   gender?: string;
   age?: number;
   yearOfExperience?: string;
-  speciality?: string;
+  specialty?: string;
   workPlace?: string;
   graduateSchool?: string;
 }
@@ -68,10 +68,10 @@ export class DoctorService {
       userId: userId,
       medicalLicenseNo: req.medicalLicenseNo,
       issueCountry: req.issueCountry,
-      speciality: req.speciality,
+      specialty: req.specialty,
       yearsOfExperience: req.yearsOfExperience,
       medicalCertificate: req.medicalCertificate,
-      govermentId: req.govermentId,
+      governmentId: req.governmentId,
       isVerified: true, // Assuming verification is successful becoz we don't have admin panel to approve yet
       submitAt: new Date(),
     };
@@ -128,13 +128,13 @@ export class DoctorService {
     }
 
     if (
-      profileData.speciality ||
+      profileData.specialty ||
       profileData.yearOfExperience ||
       profileData.workPlace ||
       profileData.graduateSchool
     ) {
       // Update doctor profile
-      if (profileData.speciality) doctor.speciality = profileData.speciality;
+      if (profileData.specialty) doctor.specialty = profileData.specialty;
       if (profileData.yearOfExperience)
         doctor.yearsOfExperience = profileData.yearOfExperience;
       if (profileData.workPlace) doctor.workPlace = profileData.workPlace;
@@ -198,7 +198,7 @@ export class DoctorService {
       verifyEmail: userDetail.verifyEmail,
       address: userDetail.address,
       phoneNumber: userDetail.phoneNumber,
-      specialty: doctorDetail.speciality,
+      specialty: doctorDetail.specialty,
       workPlace: doctorDetail.workPlace,
       graduateSchool: doctorDetail.graduateSchool,
       yearOfExp: doctorDetail.yearsOfExperience,
