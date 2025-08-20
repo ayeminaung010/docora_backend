@@ -15,6 +15,7 @@ export interface IDoctor extends Document {
     graduateSchool?: string;
     consultationType: object;
     isVerified?: boolean;
+    aboutText?: string;
     submitAt?: Date;
 }
 
@@ -75,6 +76,10 @@ const doctorSchema = new Schema<IDoctor>({
     isVerified: {
         type: Boolean,
         default: false,
+    },
+    aboutText: {
+        type: String,
+        trim: true,
     },
     submitAt: {
         type: Date,

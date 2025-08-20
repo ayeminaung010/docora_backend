@@ -203,6 +203,7 @@ export class PatientService {
     // Merge user fields into a flat shape that the client can use easily
     return doctors.map((doctor: any) => ({
       _id: doctor._id,
+      userId: doctor.userId,
       specialty: doctor.specialty,
       averageRating: doctor.averageRating,
       yearsOfExperience: doctor.yearsOfExperience ?? null,
@@ -273,9 +274,10 @@ export class PatientService {
     doctorId: string
   ): Promise<any> {
     const [userDetails, doctorDetails] = await Promise.all([
-      User.findById(userId).select("-password").lean(),
-      Doctor.findOne({ _id: doctorId }).lean(),
+      User.findById(doctorId).select("-password").lean(),
+      Doctor.findOne({ userId: doctorId }).lean(),
     ]);
+
 
     if (!userDetails) {
       throw new ApiError(404, "Doctor not found");
