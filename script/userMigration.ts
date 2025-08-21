@@ -11,7 +11,7 @@ const createRandomUser = () => {
     role: faker.helpers.arrayElement(['PATIENT', 'DOCTOR']),
     phoneNumber: faker.phone.number(),
     address: faker.location.streetAddress(true),
-    gender: faker.person.sex().toUpperCase(),
+     gender: faker.helpers.arrayElement(['Male', 'Female']),
     dateOfBirth: faker.date.birthdate(),
     age: faker.number.int({ min: 18, max: 70 }),
     profileUrl: faker.image.avatar(),

@@ -184,8 +184,7 @@ export class PatientService {
       return patient;
     }
   }
-  static async popularDoctors(limit: number = 5): Promise<any> {
-    // Fetch doctors that are verified and have a linked user
+  static async popularDoctors(limit: number = 10): Promise<any> {
     const doctors = await Doctor.find({
       isVerified: true,
       userId: { $ne: null },
@@ -200,7 +199,6 @@ export class PatientService {
       .select("specialty averageRating yearsOfExperience userId")
       .lean();
 
-    // Merge user fields into a flat shape that the client can use easily
     return doctors.map((doctor: any) => ({
       _id: doctor._id,
       userId: doctor.userId,
@@ -212,17 +210,25 @@ export class PatientService {
     }));
   }
 
-  static async filterDoctorBySpecialty(givenSpecialty: String): Promise<any> {
+ static async filterDoctorBySpecialty(givenSpecialty: String): Promise<any> {
     const resultDoctors = await Doctor.find({
       specialty: new RegExp(`^${givenSpecialty}$`, "i"),
     })
       .populate("userId", "name profileUrl")
       .sort({ averageRating: -1 })
-      .select("specialty averageRating")
+      .select("specialty averageRating yearsOfExperience")
       .lean();
 
-    return resultDoctors;
-  }
+    // Map the results to match the popularDoctors data structure
+    return resultDoctors.map((doctor: any) => ({
+      _id: doctor._id,
+      specialty: doctor.specialty,
+      averageRating: doctor.averageRating,
+      yearsOfExperience: doctor.yearsOfExperience ?? null,
+      name: doctor.userId?.name ?? null,
+      profileUrl: doctor.userId?.profileUrl ?? null,
+    }));
+}
 
   // Add these functions to your PatientService class
 
