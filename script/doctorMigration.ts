@@ -4,14 +4,12 @@ import { Doctor } from "../src/models/Doctor.model";
 import { User } from "../src/models/User.model";
 
 const medicalSpecialties = [
+  'Pediatrician',
   'General Physician',
-  'Dermatology',
-  'Neurology',
-  'Psychiatry',
-  'Radiology',
-  'Surgery',
-  'Cardiology',
-  'Dental'
+  'Dermatologist',
+  'Dentist',
+  'Cardiologist',
+  'Psychiatrist',
 ];
 
 const countries = [
