@@ -219,7 +219,6 @@ export class PatientService {
       .select("specialty averageRating yearsOfExperience")
       .lean();
 
-    // Map the results to match the popularDoctors data structure
     return resultDoctors.map((doctor: any) => ({
       _id: doctor._id,
       specialty: doctor.specialty,
@@ -229,8 +228,6 @@ export class PatientService {
       profileUrl: doctor.userId?.profileUrl ?? null,
     }));
 }
-
-  // Add these functions to your PatientService class
 
   static async searchDoctorsByName(searchTerm: string): Promise<any> {
     const doctors = await Doctor.find({ isVerified: true })
